@@ -1,0 +1,116 @@
+# Code Green Recommended Datasets
+
+## Extreme Weather
+
+Extreme weather events significantly impact communities and business every year. *Weather observations are the fundamental data used for monitoring weather and assess potential risks emerging from extreme weather conditions to issue weather warnings. *In addition, weather forecast data is valuable to improve the predictive capabilities of emergency managers and planners.
+
+### [NOAA Global Historical Climatology Network Daily (GHCN-D): https://registry.opendata.aws/noaa-ghcn/](https://registry.opendata.aws/noaa-ghcn/)
+
+**Description:** The Global Historical Climatology Network Daily database, GHCN-D, contains meteorological measurements from over 90,000 stations across the globe. This dataset is generated using weather observations, about two thirds of which are for precipitation measurement only.  
+**Main variables:** Precipitation, daily maximum and minimum temperature, temperature at the time of observation, snowfall and snow depth.  
+**Spatial Resolution:** Station-based.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** Daily.  
+**Temporal Coverage:** 1763 to present (varies by station).  
+**Data format:** CSV.  
+**Notes:** It is a composite of climate records from numerous sources that were merged together and subjected to a common suite of quality assurance reviews.  
+**Access this data on AWS:**  
+    Via AWS Command Line Interface (example):  
+aws s3 cp s3://noaa-ghcn-pds/csv.gz/1788.csv.gz localdir_path  
+aws s3 cp s3://noaa-ghcn-pds/csv/1788.csv localdir_path   
+e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
+     Via HTTP (example):  
+https://noaa-ghcn-pds.s3.amazonaws.com/csv.gz/1788.csv.gzhttps://noaa-ghcn-pds.s3.amazonaws.com/csv/1788.csv  
+**Additonal Resources:**  
+[Visualize over 200 years of global climate data using Amazon Athena and Amazon QuickSight](https://aws.amazon.com/blogs/big-data/visualize-over-200-years-of-global-climate-data-using-amazon-athena-and-amazon-quicksight/)  
+
+### [NOAA Global Forecast System (GFS): https://registry.opendata.aws/noaa-gfs-bdp-pds/](https://registry.opendata.aws/noaa-gfs-bdp-pds/)
+**Description:** NOAA Global Forecast System is the operational global forecast model run by the U.S. National Weather Service. The GFS forecasts numerous variables with x-y-pressure coordinates.  
+**Main variables:** Precipitation, temperature, winds.  
+**Spatial Resolution:** 0.125 degree.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** 1-hourly.  
+**Temporal Coverage:** Rolling 4-week archive.  
+**Data format:** grib2.  
+**Access this data on AWS:**  
+         Via AWS Command Line Interface (example):  
+aws s3 cp s3://noaa-gfs-bdp-pds/gfs.20191111/00/gfs.t00z.pgrb2full.0p50.f000 localdir_path  
+e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
+         Via HTTP (example):  
+https://noaa-gfs-bdp-pds.s3.amazonaws.com/gfs.20191111/00/gfs.t00z.pgrb2full.0p50.f000  
+**Additonal Resources:**  
+[NOAA GFS on AWS Jupyter Notebook](https://github.com/creare-com/podpac-examples/blob/master/notebooks/demos/gfs.ipynb)  
+
+### [ECMWF ERA5: https://registry.opendata.aws/ecmwf-era5/](https://registry.opendata.aws/ecmwf-era5/):
+**Description:** ERA5 is the fifth generation of ECMWF atmospheric reanalyses of the global climate, and the first reanalysis produced as an operational service. It utilizes the best available observation data from satellites and in-situ stations, which are assimilated and processed using ECMWF's Integrated Forecast System (IFS) Cycle 41r2.  
+**Main variables:** Precipitation, temperature, winds.  
+**Spatial Resolution:** 31 km.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** 1-hourly.  
+**Temporal Coverage:** 2008-2018.  
+**Data format:** netcdf.  
+**Access this data on AWS:**  
+         Via AWS Command Line Interface (example):  
+aws s3 cp s3://era5-pds/2018/01/data/air_temperature_at_2_metres.nc localdir_path  
+e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
+         Via HTTP (example):  
+https://era5-pds.s3.amazonaws.com/2018/01/data/air_temperature_at_2_metres.nc  
+**Additonal Resources:**  
+[Accessing ERA5 Data on S3 Jupyter Notebook](https://github.com/planet-os/notebooks/blob/master/aws/era5-s3-via-boto.ipynb)  
+
+
+## Air Quality
+
+Air quality is said to have the largest impact on human health of any weather related phenomena. Heavily influenced by the weather as wild fires generate hazardous smoke which can impact large population centers for days at a time. 
+
+### [OpenAQ: https://registry.opendata.aws/openaq/](https://registry.opendata.aws/openaq/):
+**Description:** Global, aggregated physical air quality data from public data sources provided by government, research-grade and other sources.  
+**Main variables:** PM2.5, PM10.  
+**Spatial Resolution:** Station-based.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** Minutes.  
+**Temporal Coverage:** 2013 to present (varies by station).  
+**Data format:** JSON.  
+**Access this data on AWS:**  
+         Via AWS Command Line Interface (example):  
+aws s3 cp s3://openaq-fetches/realtime/2019-11-11/1573430464.ndjson localdir_path  
+e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
+         Via HTTP (example):  
+https://openaq-fetches.s3.amazonaws.com/realtime/2019-11-11/1573430464.ndjson . 
+**Additonal Resources:**  
+[Using Athena to access the whole archive](https://medium.com/@openaq/how-in-the-world-do-you-access-air-quality-data-older-than-90-days-on-the-openaq-platform-8562df519ecd)  
+[Access OpenAQ data via a filterable SNS topic](https://medium.com/@openaq/get-faster-access-to-real-time-air-quality-data-from-around-the-world-c6f9793d5242)  
+
+### [SILAM Air Quality Forecasts: https://registry.opendata.aws/silam/](https://registry.opendata.aws/silam/)
+**Description:** SILAM atmospheric composition and air quality forecast performed on a daily basis for > 100 species and covering the troposphere and the stratosphere.  
+**Main variables:** CO, NO2.  
+**Spatial Resolution:** 20 km.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** 1-day.  
+**Temporal Coverage:** Rolling 10-day archive.  
+**Data format:** netcdf or zarr.  
+**Access this data on AWS:**  
+         Via AWS Command Line Interface (example):  
+aws s3 cp s3://fmi-opendata-silam-surface-netcdf/global/20191021/silam_glob_v5_6_20191021_CO_d0.nc localdir_path  
+e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
+         Via HTTP (example):  
+https://fmi-opendata-silam-surface-netcdf.s3.amazonaws.com/global/20191021/silam_glob_v5_6_20191021_CO_d0.nc  
+**Additonal Resources:**  
+[Simple ZARR Example Jupyter Notebook](https://github.com/fmidev/opendata-resources/blob/master/examples/python/Simple%20Zarr%20Example.ipynb)  
+
+
+## Future Climate
+
+The effects of climate change on communities and business are visible today, expected to increase over time, and will have disproportionate impacts on some more vulnerable communities. These impacts are already happening: from more intense hurricanes, to droughts and heat waves, climate change is creating new risks to physical assets, populations and business operations. 
+
+### [Community Earth System Model Large Ensemble (CESM LENS): https://registry.opendata.aws/ncar-cesm-lens/](https://registry.opendata.aws/ncar-cesm-lens/)
+**Description:** The Community Earth System Model (CESM) Large Ensemble Numerical Simulation (LENS) dataset includes a 40-member ensemble of climate simulations using historical data (1920-2005) or assuming the RCP8.5 greenhouse gas concentration scenario (2006-2100), as well as longer control runs based on pre-industrial conditions. The data comprise both surface (2D) and volumetric (3D) variables in the atmosphere, ocean, land, and ice domains.  
+**Main variables:** Temperature, Precipitation.  
+**Spatial Resolution:** 1 degree.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** 6-hourly.  
+**Temporal Coverage:** Historical 1920-2005, Future 2006-2100.  
+**Data format:** zarr.  
+**Additonal Resources:**  
+[Example Jupyter Notebook](https://github.com/NCAR/cesm-lens-aws/blob/master/notebooks/kay-et-al-2015.v3.ipynb)  
+
