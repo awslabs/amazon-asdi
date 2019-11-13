@@ -63,53 +63,54 @@ https://era5-pds.s3.amazonaws.com/2018/01/data/air_temperature_at_2_metres.nc
 
 Air quality is said to have the largest impact on human health of any weather related phenomena. Heavily influenced by the weather as wild fires generate hazardous smoke which can impact large population centers for days at a time. 
 
-[OpenAQ: https://registry.opendata.aws/openaq/](https://registry.opendata.aws/openaq/):
-**Description: **Global, aggregated physical air quality data from public data sources provided by government, research-grade and other sources.
-**Main variables: **PM2.5, PM10
-**Spatial Resolution: **Station-based
-**Spatial Coverage: **Global
-**Temporal Resolution:** Minutes
-**Temporal Coverage: **2013 to present (varies by station)
-**Data format:** JSON
-**Access this data on AWS: **
-         Via AWS Command Line Interface (example):
-aws s3 cp s3://openaq-fetches/realtime/2019-11-11/1573430464.ndjson localdir_path
-e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in
-         Via HTTP (example):
-https://openaq-fetches.s3.amazonaws.com/realtime/2019-11-11/1573430464.ndjson
-**Additonal Resources:**  [Using Athena to access the whole archive](https://medium.com/@openaq/how-in-the-world-do-you-access-air-quality-data-older-than-90-days-on-the-openaq-platform-8562df519ecd)
-[Access OpenAQ data via a filterable SNS topic](https://medium.com/@openaq/get-faster-access-to-real-time-air-quality-data-from-around-the-world-c6f9793d5242)
+### [OpenAQ: https://registry.opendata.aws/openaq/](https://registry.opendata.aws/openaq/):
+**Description:** Global, aggregated physical air quality data from public data sources provided by government, research-grade and other sources.  
+**Main variables:** PM2.5, PM10.  
+**Spatial Resolution:** Station-based.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** Minutes.  
+**Temporal Coverage:** 2013 to present (varies by station).  
+**Data format:** JSON.  
+**Access this data on AWS:**  
+         Via AWS Command Line Interface (example):  
+aws s3 cp s3://openaq-fetches/realtime/2019-11-11/1573430464.ndjson localdir_path  
+e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
+         Via HTTP (example):  
+https://openaq-fetches.s3.amazonaws.com/realtime/2019-11-11/1573430464.ndjson . 
+**Additonal Resources:**  
+[Using Athena to access the whole archive](https://medium.com/@openaq/how-in-the-world-do-you-access-air-quality-data-older-than-90-days-on-the-openaq-platform-8562df519ecd)  
+[Access OpenAQ data via a filterable SNS topic](https://medium.com/@openaq/get-faster-access-to-real-time-air-quality-data-from-around-the-world-c6f9793d5242)  
 
-[SILAM Air Quality Forecasts: https://registry.opendata.aws/silam/](https://registry.opendata.aws/silam/)
-**Description: **SILAM atmospheric composition and air quality forecast performed on a daily basis for > 100 species and covering the troposphere and the stratosphere.
-**Main variables: **CO, NO2
-**Spatial Resolution: **20 km
-**Spatial Coverage: **Global
-**Temporal Resolution:** 1-day
-**Temporal Coverage: **Rolling 10-day archive
-**Data format:** netcdf or zarr
-**Access this data on AWS: **
-         Via AWS Command Line Interface (example):
-aws s3 cp s3://fmi-opendata-silam-surface-netcdf/global/20191021/silam_glob_v5_6_20191021_CO_d0.nc localdir_path
-e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in
-         Via HTTP (example):
-https://fmi-opendata-silam-surface-netcdf.s3.amazonaws.com/global/20191021/silam_glob_v5_6_20191021_CO_d0.nc
-**Additonal Resources:**
-[Simple ZARR Example Jupyter Notebook](https://github.com/fmidev/opendata-resources/blob/master/examples/python/Simple%20Zarr%20Example.ipynb)
+### [SILAM Air Quality Forecasts: https://registry.opendata.aws/silam/](https://registry.opendata.aws/silam/)
+**Description:** SILAM atmospheric composition and air quality forecast performed on a daily basis for > 100 species and covering the troposphere and the stratosphere.  
+**Main variables:** CO, NO2.  
+**Spatial Resolution:** 20 km.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** 1-day.  
+**Temporal Coverage:** Rolling 10-day archive.  
+**Data format:** netcdf or zarr.  
+**Access this data on AWS:**  
+         Via AWS Command Line Interface (example):  
+aws s3 cp s3://fmi-opendata-silam-surface-netcdf/global/20191021/silam_glob_v5_6_20191021_CO_d0.nc localdir_path  
+e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
+         Via HTTP (example):  
+https://fmi-opendata-silam-surface-netcdf.s3.amazonaws.com/global/20191021/silam_glob_v5_6_20191021_CO_d0.nc  
+**Additonal Resources:**  
+[Simple ZARR Example Jupyter Notebook](https://github.com/fmidev/opendata-resources/blob/master/examples/python/Simple%20Zarr%20Example.ipynb)  
 
 
 ## Future Climate
 
 The effects of climate change on communities and business are visible today, expected to increase over time, and will have disproportionate impacts on some more vulnerable communities. These impacts are already happening: from more intense hurricanes, to droughts and heat waves, climate change is creating new risks to physical assets, populations and business operations. 
 
-[Community Earth System Model Large Ensemble (CESM LENS): https://registry.opendata.aws/ncar-cesm-lens/](https://registry.opendata.aws/ncar-cesm-lens/)
-**Description: **The Community Earth System Model (CESM) Large Ensemble Numerical Simulation (LENS) dataset includes a 40-member ensemble of climate simulations using historical data (1920-2005) or assuming the RCP8.5 greenhouse gas concentration scenario (2006-2100), as well as longer control runs based on pre-industrial conditions. The data comprise both surface (2D) and volumetric (3D) variables in the atmosphere, ocean, land, and ice domains.
-**Main variables: **Temperature, Precipitation
-**Spatial Resolution: **1 degree
-**Spatial Coverage: **Global
-**Temporal Resolution:** 6-hourly
-**Temporal Coverage: **Historical 1920-2005, Future 2006-2100
-**Data format:** zarr
-**Additonal Resources:**
-[Example Jupyter Notebook](https://github.com/NCAR/cesm-lens-aws/blob/master/notebooks/kay-et-al-2015.v3.ipynb)
+### [Community Earth System Model Large Ensemble (CESM LENS): https://registry.opendata.aws/ncar-cesm-lens/](https://registry.opendata.aws/ncar-cesm-lens/)
+**Description:** The Community Earth System Model (CESM) Large Ensemble Numerical Simulation (LENS) dataset includes a 40-member ensemble of climate simulations using historical data (1920-2005) or assuming the RCP8.5 greenhouse gas concentration scenario (2006-2100), as well as longer control runs based on pre-industrial conditions. The data comprise both surface (2D) and volumetric (3D) variables in the atmosphere, ocean, land, and ice domains.  
+**Main variables:** Temperature, Precipitation.  
+**Spatial Resolution:** 1 degree.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** 6-hourly.  
+**Temporal Coverage:** Historical 1920-2005, Future 2006-2100.  
+**Data format:** zarr.  
+**Additonal Resources:**  
+[Example Jupyter Notebook](https://github.com/NCAR/cesm-lens-aws/blob/master/notebooks/kay-et-al-2015.v3.ipynb)  
 
