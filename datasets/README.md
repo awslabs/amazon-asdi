@@ -4,7 +4,7 @@
 
 Extreme weather events significantly impact communities and business every year. *Weather observations are the fundamental data used for monitoring weather and assess potential risks emerging from extreme weather conditions to issue weather warnings. *In addition, weather forecast data is valuable to improve the predictive capabilities of emergency managers and planners.
 
-[NOAA Global Historical Climatology Network Daily (GHCN-D): https://registry.opendata.aws/noaa-ghcn/](https://registry.opendata.aws/noaa-ghcn/)
+### [NOAA Global Historical Climatology Network Daily (GHCN-D): https://registry.opendata.aws/noaa-ghcn/](https://registry.opendata.aws/noaa-ghcn/)
 
 **Description:** The Global Historical Climatology Network Daily database, GHCN-D, contains meteorological measurements from over 90,000 stations across the globe. This dataset is generated using weather observations, about two thirds of which are for precipitation measurement only.  
 **Main variables:** Precipitation, daily maximum and minimum temperature, temperature at the time of observation, snowfall and snow depth.  
@@ -20,43 +20,43 @@ aws s3 cp s3://noaa-ghcn-pds/csv.gz/1788.csv.gz localdir_path
 aws s3 cp s3://noaa-ghcn-pds/csv/1788.csv localdir_path   
 e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
      Via HTTP (example):  
-
 https://noaa-ghcn-pds.s3.amazonaws.com/csv.gz/1788.csv.gzhttps://noaa-ghcn-pds.s3.amazonaws.com/csv/1788.csv  
 **Additonal Resources:**  
 [Visualize over 200 years of global climate data using Amazon Athena and Amazon QuickSight](https://aws.amazon.com/blogs/big-data/visualize-over-200-years-of-global-climate-data-using-amazon-athena-and-amazon-quicksight/)  
 
-[NOAA Global Forecast System (GFS): https://registry.opendata.aws/noaa-gfs-bdp-pds/](https://registry.opendata.aws/noaa-gfs-bdp-pds/)
-**Description: **NOAA Global Forecast System is the operational global forecast model run by the U.S. National Weather Service. The GFS forecasts numerous variables with x-y-pressure coordinates.
-**Main variables: **Precipitation, temperature, winds
-**Spatial Resolution: **0.125 degree
-**Spatial Coverage: **Global
-**Temporal Resolution:** 1-hourly
-**Temporal Coverage: **Rolling 4-week archive
-**Data format:** grib2
-**Access this data on AWS: **
-         Via AWS Command Line Interface (example):
-aws s3 cp s3://noaa-gfs-bdp-pds/gfs.20191111/00/gfs.t00z.pgrb2full.0p50.f000 localdir_path
-e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in
-         Via HTTP (example):
-https://noaa-gfs-bdp-pds.s3.amazonaws.com/gfs.20191111/00/gfs.t00z.pgrb2full.0p50.f000
-**Additonal Resources:** [NOAA GFS on AWS Jupyter Notebook](https://github.com/creare-com/podpac-examples/blob/master/notebooks/demos/gfs.ipynb)
+### [NOAA Global Forecast System (GFS): https://registry.opendata.aws/noaa-gfs-bdp-pds/](https://registry.opendata.aws/noaa-gfs-bdp-pds/)
+**Description:** NOAA Global Forecast System is the operational global forecast model run by the U.S. National Weather Service. The GFS forecasts numerous variables with x-y-pressure coordinates.  
+**Main variables:** Precipitation, temperature, winds.  
+**Spatial Resolution:** 0.125 degree.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** 1-hourly.  
+**Temporal Coverage:** Rolling 4-week archive.  
+**Data format:** grib2.  
+**Access this data on AWS:**  
+         Via AWS Command Line Interface (example):  
+aws s3 cp s3://noaa-gfs-bdp-pds/gfs.20191111/00/gfs.t00z.pgrb2full.0p50.f000 localdir_path  
+e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
+         Via HTTP (example):  
+https://noaa-gfs-bdp-pds.s3.amazonaws.com/gfs.20191111/00/gfs.t00z.pgrb2full.0p50.f000  
+**Additonal Resources:**  
+[NOAA GFS on AWS Jupyter Notebook](https://github.com/creare-com/podpac-examples/blob/master/notebooks/demos/gfs.ipynb)  
 
-[ECMWF ERA5: https://registry.opendata.aws/ecmwf-era5/](https://registry.opendata.aws/ecmwf-era5/):
-**Description: **ERA5 is the fifth generation of ECMWF atmospheric reanalyses of the global climate, and the first reanalysis produced as an operational service. It utilizes the best available observation data from satellites and in-situ stations, which are assimilated and processed using ECMWF's Integrated Forecast System (IFS) Cycle 41r2.
-**Main variables: **Precipitation, temperature, winds
-**Spatial Resolution: **31 km
-**Spatial Coverage: **Global
-**Temporal Resolution:** 1-hourly
-**Temporal Coverage: **2008-2018
-**Data format:** netcdf
-**Access this data on AWS: **
-         Via AWS Command Line Interface (example):
-aws s3 cp s3://era5-pds/2018/01/data/air_temperature_at_2_metres.nc localdir_path
-e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in
-         Via HTTP (example):
-https://era5-pds.s3.amazonaws.com/2018/01/data/air_temperature_at_2_metres.nc
-**Additonal Resources:**
-[Accessing ERA5 Data on S3 Jupyter Notebook](https://github.com/planet-os/notebooks/blob/master/aws/era5-s3-via-boto.ipynb)
+### [ECMWF ERA5: https://registry.opendata.aws/ecmwf-era5/](https://registry.opendata.aws/ecmwf-era5/):
+**Description:** ERA5 is the fifth generation of ECMWF atmospheric reanalyses of the global climate, and the first reanalysis produced as an operational service. It utilizes the best available observation data from satellites and in-situ stations, which are assimilated and processed using ECMWF's Integrated Forecast System (IFS) Cycle 41r2.  
+**Main variables:** Precipitation, temperature, winds.  
+**Spatial Resolution:** 31 km.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** 1-hourly.  
+**Temporal Coverage:** 2008-2018.  
+**Data format:** netcdf.  
+**Access this data on AWS:**  
+         Via AWS Command Line Interface (example):  
+aws s3 cp s3://era5-pds/2018/01/data/air_temperature_at_2_metres.nc localdir_path  
+e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
+         Via HTTP (example):  
+https://era5-pds.s3.amazonaws.com/2018/01/data/air_temperature_at_2_metres.nc  
+**Additonal Resources:**  
+[Accessing ERA5 Data on S3 Jupyter Notebook](https://github.com/planet-os/notebooks/blob/master/aws/era5-s3-via-boto.ipynb)  
 
 
 ## Air Quality
