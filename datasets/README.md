@@ -6,21 +6,14 @@ Extreme weather events significantly impact communities and business every year.
 
 [NOAA Global Historical Climatology Network Daily (GHCN-D): https://registry.opendata.aws/noaa-ghcn/](https://registry.opendata.aws/noaa-ghcn/)
 
-**Description: **The Global Historical Climatology Network Daily database, GHCN-D, contains meteorological measurements from over 90,000 stations across the globe.** **This dataset is generated using weather observations, about two thirds of which are for precipitation measurement only.
-
-**Main variables: **Precipitation, daily maximum and minimum temperature, temperature at the time of observation, snowfall and snow depth. 
-
-**Spatial Resolution: **Station-based
-
-**Spatial Coverage: **Global
-
+**Description: ** The Global Historical Climatology Network Daily database, GHCN-D, contains meteorological measurements from over 90,000 stations across the globe. This dataset is generated using weather observations, about two thirds of which are for precipitation measurement only.
+**Main variables: ** Precipitation, daily maximum and minimum temperature, temperature at the time of observation, snowfall and snow depth. 
+**Spatial Resolution: ** Station-based
+**Spatial Coverage: ** Global
 **Temporal Resolution:** Daily
-
-**Temporal Coverage: **1763 to present (varies by station)
-
+**Temporal Coverage: ** 1763 to present (varies by station)
 **Data format:** CSV
-
-**Notes: **It is a composite of climate records from numerous sources that were merged together and subjected to a common suite of quality assurance reviews. 
+**Notes: ** It is a composite of climate records from numerous sources that were merged together and subjected to a common suite of quality assurance reviews. 
 
 **Access this data on AWS: **
 
