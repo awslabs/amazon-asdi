@@ -6,32 +6,24 @@ Extreme weather events significantly impact communities and business every year.
 
 [NOAA Global Historical Climatology Network Daily (GHCN-D): https://registry.opendata.aws/noaa-ghcn/](https://registry.opendata.aws/noaa-ghcn/)
 
-**Description: ** The Global Historical Climatology Network Daily database, GHCN-D, contains meteorological measurements from over 90,000 stations across the globe. This dataset is generated using weather observations, about two thirds of which are for precipitation measurement only.
-**Main variables: ** Precipitation, daily maximum and minimum temperature, temperature at the time of observation, snowfall and snow depth. 
-**Spatial Resolution: ** Station-based
-**Spatial Coverage: ** Global
-**Temporal Resolution:** Daily
-**Temporal Coverage: ** 1763 to present (varies by station)
-**Data format:** CSV
-**Notes: ** It is a composite of climate records from numerous sources that were merged together and subjected to a common suite of quality assurance reviews. 
+**Description:** The Global Historical Climatology Network Daily database, GHCN-D, contains meteorological measurements from over 90,000 stations across the globe. This dataset is generated using weather observations, about two thirds of which are for precipitation measurement only.  
+**Main variables:** Precipitation, daily maximum and minimum temperature, temperature at the time of observation, snowfall and snow depth.  
+**Spatial Resolution:** Station-based.  
+**Spatial Coverage:** Global.  
+**Temporal Resolution:** Daily.  
+**Temporal Coverage:** 1763 to present (varies by station).  
+**Data format:** CSV.  
+**Notes:** It is a composite of climate records from numerous sources that were merged together and subjected to a common suite of quality assurance reviews.  
+**Access this data on AWS:**  
+    Via AWS Command Line Interface (example):  
+aws s3 cp s3://noaa-ghcn-pds/csv.gz/1788.csv.gz localdir_path  
+aws s3 cp s3://noaa-ghcn-pds/csv/1788.csv localdir_path   
+e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in  
+     Via HTTP (example):  
 
-**Access this data on AWS: **
-
-    Via AWS Command Line Interface (example):
-
-aws s3 cp s3://noaa-ghcn-pds/csv.gz/1788.csv.gz localdir_path
-
-aws s3 cp s3://noaa-ghcn-pds/csv/1788.csv localdir_path
-
-e.g.  localdir_path could be ‘/temp/’  or ‘.’ to download to the directory that you are in
-
-     Via HTTP (example):
-
-https://noaa-ghcn-pds.s3.amazonaws.com/csv.gz/1788.csv.gzhttps://noaa-ghcn-pds.s3.amazonaws.com/csv/1788.csv
-
-**Additonal Resources:** 
-
-[Visualize over 200 years of global climate data using Amazon Athena and Amazon QuickSight](https://aws.amazon.com/blogs/big-data/visualize-over-200-years-of-global-climate-data-using-amazon-athena-and-amazon-quicksight/)
+https://noaa-ghcn-pds.s3.amazonaws.com/csv.gz/1788.csv.gzhttps://noaa-ghcn-pds.s3.amazonaws.com/csv/1788.csv  
+**Additonal Resources:**  
+[Visualize over 200 years of global climate data using Amazon Athena and Amazon QuickSight](https://aws.amazon.com/blogs/big-data/visualize-over-200-years-of-global-climate-data-using-amazon-athena-and-amazon-quicksight/)  
 
 [NOAA Global Forecast System (GFS): https://registry.opendata.aws/noaa-gfs-bdp-pds/](https://registry.opendata.aws/noaa-gfs-bdp-pds/)
 **Description: **NOAA Global Forecast System is the operational global forecast model run by the U.S. National Weather Service. The GFS forecasts numerous variables with x-y-pressure coordinates.
