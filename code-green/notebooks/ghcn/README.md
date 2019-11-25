@@ -14,7 +14,7 @@ docker build -t ghcn .
 ## Run Jupyter Notebook
 
 ```
-docker run --rm -p 8888:8888 -v $(PWD)/notebook:/home/jovyan -ti ghcn
+docker run --rm -p 8888:8888 -v $(pwd)/notebook:/home/jovyan -ti ghcn
 ```
 
 ## SSH Tunneling to your EC2 instance
