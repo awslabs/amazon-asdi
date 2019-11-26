@@ -1,0 +1,7 @@
+{ 
+    "queryStringParameters": {
+        "cities": "list", 
+        "days": "10", 
+        "target": "180"
+    }
+}

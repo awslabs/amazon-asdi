@@ -111,13 +111,14 @@
   
   
     <script>
+      URL = 'https://60ph734gnb.execute-api.us-east-1.amazonaws.com/test/query'
     
       $("form").on('submit',function(e){
           e.preventDefault();
           $(".find_city").toggle()
         
           cel = document.getElementById("degrees").value * 10;
-          url = 'https://60ph734gnb.execute-api.us-east-1.amazonaws.com/test/query?cities=best&target=' + cel + '&days=7';
+          url = URL + '?cities=best&target=' + cel + '&days=14';
           console.log(cel + ' ' + url)
 
           // trigger async function, log response or catch error of fetch promise
