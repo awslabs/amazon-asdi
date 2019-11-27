@@ -4,22 +4,41 @@ import json
 import collections
 import operator
 import datetime
+import os
 
-# athena constant
-DATABASE = 'ghcn'
+# athena database name
+athenaDatabase = 'ghcn'
 
 # S3 constant
 S3_QUERY='query-result'
 S3_BUCKET ='YOUR_BUCKET_HERE'
 
 # set defaults
-S3_OUTPUT = 's3://' + S3_BUCKET + '/' + S3_QUERY
 DEFAULT_CITIES = "best" # choices are 'list' (returns all cities) or 'best' (returns city with closest temp to target temp)
 DEFAULT_TARGET = 230 # Any int that is represented in tenths of celcius
 DEFAULT_DATE_HISTORY = 14 # defaults to 14 days from current day in SQL query
 DEFAULT_MIN_LOOKBACK = 5
 # number of retries
 RETRY_COUNT = 15
+
+## override defaults with Environment variables if available
+if 'GLUE_DATABASE' in os.environ:
+    athenaDatabase = os.environ['GLUE_DATABASE']
+
+if 'S3_QUERY_OUTPUT_LOCATION' in os.environ:
+    S3_OUTPUT = os.environ['S3_QUERY_OUTPUT_LOCATION']
+else:
+    S3_OUTPUT = 's3://' + S3_BUCKET + '/' + S3_QUERY
+
+if 'GHCN_TABLE_NAME' in os.environ:
+    GHCN_TABLE_NAME = os.environ['GHCN_TABLE_NAME']
+else:
+    GHCN_TABLE_NAME = 'ghcntable'
+
+if 'STADIUM_TABLE_NAME' in os.environ:
+    STADIUM_TABLE_NAME = os.environ['STADIUM_TABLE_NAME']
+else:
+    STADIUM_TABLE_NAME = 'stadium'
 
 def lambda_handler(event, context):
     
@@ -48,11 +67,11 @@ def lambda_handler(event, context):
     queryDate = int(dateObj.strftime('%Y%m%d'))
 
     # query has hardcoded elements for simplicity of this workshop
-    query = """SELECT city, avg(CAST(data_value as INTEGER)) as temp FROM stadium 
-        INNER JOIN ghcntable ON stadium.station_id = ghcntable.id 
-        WHERE ghcntable.year_date >= '%i' 
-        AND ghcntable.element = 'TAVG' 
-        GROUP BY city""" %queryDate 
+    query = f"""SELECT city, avg(CAST(data_value as INTEGER)) as temp FROM "{STADIUM_TABLE_NAME}" as stadium
+        INNER JOIN "{GHCN_TABLE_NAME}" as ghcn  ON stadium.station_id = ghcn.id 
+        WHERE ghcn.year_date >= '{queryDate}' 
+        AND ghcn.element = 'TAVG' 
+        GROUP BY city"""
     
     # athena client
     client = boto3.client('athena')
@@ -61,7 +80,7 @@ def lambda_handler(event, context):
     response = client.start_query_execution(
         QueryString=query,
         QueryExecutionContext={
-            'Database': DATABASE
+            'Database': athenaDatabase
         },
         ResultConfiguration={
             'OutputLocation': S3_OUTPUT,
