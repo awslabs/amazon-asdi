@@ -198,7 +198,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "code-green-asdi",
-          "S3Key": "sam-deployments/e7851768aba892c80e38072f57105b75"
+          "S3Key": "sam-deployments/d5cf5c5f5cf72dd168d865af2dfd5d4a"
         },
         "Tags": [
           {
