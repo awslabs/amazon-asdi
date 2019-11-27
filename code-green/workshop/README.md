@@ -24,26 +24,28 @@ Today we’re going to create an API for use by DeepRacer officials when choosin
 
 ### Contents
 
--	Sections:
-  -	/sections/1-s3.pdf
-  - /sections/2-athena.pdf
-  - /sections/3-agigw-lambda.pdf
-  - /sections/4-s3-web.pdf
-  - /sections/5-useful-links.pdf
+#### Sections
+
+-	[Create an S3 bucket and subdirectories](sections/Section-1-S3.pdf)
+- [Connecting Athena to the NOAA data repository](sections/Section-2-Athena.pdf)
+- [Creating the endpoint and querying Athena](sections/Section-3-APIGW-Lambda.pdf)
+- [Create an S3 bucket and subdirectories as a webserver](sections/Section-4-S3-web.pdf)
+- [Customize the Code Green Workshop](sections/Section-5-next-steps-references.pdf)
   
--	Code:
-  - code/iam.json
-  - code/lambda-code.py
-  - code/sql-statements.sql
-  - code/test-event-lambda.json
-  - code/index.html
-  - code/stadiums-with-stations_global.csv
+#### Code
+
+- [iam.json](code/iam.json)
+- [lambda-code.py](code/lambda-code.py)
+- [sql-statements.sql](code/sql-statements.sql)
+- [test-event-lambda.json](code/test-event-lambda.json)
+- [index.html](code/index.html)
+- [stadiums-with-stations_global.csv](code/stadiums-with-stations_global.csv)
   
 ### Getting started
 
--	Begin with Section 1 and progress through the sections in order, as successful completion of each exercise is necessary to complete subsequent sections.
+-	Begin with [Section 1](sections/Section-1-S3.pdf) and progress through the sections in order, as successful completion of each exercise is necessary to complete subsequent sections.
 - As a best practice, as you create new objects in AWS, keep track of what you have created (names of things like S3 buckets, database names, etc) in a notebook or text editor. This will make it easier to refer to these objects in other sections.
--	The workshop uses Event Engine, a tool used for AWS events which will automatically create a correctly-configured temporary account for workshop participants. The account will be automatically cleaned up and deleted after the workshop is over. If you want to recreate the workshop in your own account later, a CloudFormation template is available.
+-	The workshop uses Event Engine, a tool used for AWS events which will automatically create a correctly-configured temporary account for workshop participants. The account will be automatically cleaned up and deleted after the workshop is over. If you want to recreate the workshop in your own account later, [a CloudFormation template is available](completed-workshop.cfn.json) which will automatically create the completed workshop.
 
 ### High-level workflow
 
