@@ -85,11 +85,24 @@
               Track Finder will look for the DeepRacer League City most likely to be near it.
             </p>
           
-            <form class="form-inline justify-content-center find_city">
-              <div class="form-group  mx-sm-3 mt-4">
-                <input type="number" name="cel" id="degrees" class="form-control mb-4" required="required" placeholder="degrees Celsius" autofocus="autofocus">
+            <form class="find_city">
+              <div class="form-inline justify-content-center">
+                <div class="form-group  mx-sm-3 mt-4">
+                  <input type="number" name="cel" id="degrees" class="form-control mb-4" required="required" placeholder="degrees Celsius" autofocus="autofocus">
+                </div>
+                <button type="submit" class="btn btn-primary mb-0" id="submitter">Go</button>
               </div>
-              <button type="submit" class="btn btn-primary mb-0" id="submitter">Go</button>
+              
+              <div class="form-group mx-sm-3 mt-3">
+                <a href="#" onclick="$('.api').toggle();" class="api">use your own endpoint!</a>
+                
+                <div class="api" style="display:none;">
+                  <input type="url" id="api-endpoint" class="form-control mb-4 justify-content-center" style="max-width:400px; margin-left: auto; margin-right: auto;" placeholder="https://example.com" pattern="https://.*">
+                  <div style="font-size:11px;">
+                    You'll encounter CORS issues using your own endpoint. Docs on getting around that <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html" target="_blank">here.</a>
+                  </div>
+                </div>
+              </div>
             </form>
         
             <h2 id="result" class="mt-4 mb-3 find_city" style="display: none; color:red">Determining best city<br>using NOAA ASDI data.... </h2>
@@ -111,15 +124,23 @@
   
   
     <script>
-      URL = 'https://60ph734gnb.execute-api.us-east-1.amazonaws.com/test/query'
+      URL = 'https://60ph734gnb.execute-api.us-east-1.amazonaws.com/test/query';
     
       $("form").on('submit',function(e){
           e.preventDefault();
-          $(".find_city").toggle()
+          $(".find_city").toggle();
         
-          cel = document.getElementById("degrees").value * 10;
+          // put degrees celsius into correct format
+          cel = $("#degrees").val() * 10;
+          
+          // select between default or user endpoints
+          user_api_endpoint = $("#api-endpoint").val();
+          if (typeof user_api_endpoint != 'undefined' && user_api_endpoint.length > 0) {
+            URL = user_api_endpoint;
+          }
+          
           url = URL + '?cities=best&target=' + cel + '&days=14';
-          console.log(cel + ' ' + url)
+          console.log(cel + ' ' + url);
 
           // trigger async function, log response or catch error of fetch promise
           fetchAsync(url)
