@@ -1,6 +1,12 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Outputs": {
+    "WebsiteUrl": {
+      "Description": "Url of website to visit to use endpoint",
+      "Value": {
+        "Fn::Sub": "http://code-green-asdi.s3-website-us-east-1.amazonaws.com?endpoint=https%3A%2F%2F${ServerlessRestApi}.execute-api.us-east-1.amazonaws.com%2FProd%2Fquery"
+      }
+    },
     "QueryEndpoint": {
       "Description": "API Endpoint to invoke query",
       "Value": {
@@ -26,11 +32,21 @@
         }
       }
     },
+    "ServerlessRestApiDeploymentdc1a9cc033": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: dc1a9cc0334b162948a679437613612ba89968fa",
+        "StageName": "Stage"
+      }
+    },
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment388c74a2eb"
+          "Ref": "ServerlessRestApiDeploymentdc1a9cc033"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -358,16 +374,6 @@
         }
       }
     },
-    "ServerlessRestApiDeployment388c74a2eb": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 388c74a2eb1894a9078ae9c149354412a9e1cdad",
-        "StageName": "Stage"
-      }
-    },
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
@@ -380,6 +386,46 @@
           },
           "paths": {
             "/query": {
+              "options": {
+                "x-amazon-apigateway-integration": {
+                  "type": "mock",
+                  "requestTemplates": {
+                    "application/json": "{\n  \"statusCode\" : 200\n}\n"
+                  },
+                  "responses": {
+                    "default": {
+                      "statusCode": "200",
+                      "responseTemplates": {
+                        "application/json": "{}\n"
+                      },
+                      "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                        "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+                      }
+                    }
+                  }
+                },
+                "consumes": [
+                  "application/json"
+                ],
+                "summary": "CORS support",
+                "responses": {
+                  "200": {
+                    "headers": {
+                      "Access-Control-Allow-Origin": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Methods": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "Default response for CORS method"
+                  }
+                },
+                "produces": [
+                  "application/json"
+                ]
+              },
               "x-amazon-apigateway-any-method": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST",

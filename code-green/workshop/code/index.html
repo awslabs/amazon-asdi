@@ -133,7 +133,13 @@
           // put degrees celsius into correct format
           cel = $("#degrees").val() * 10;
           
-          // select between default or user endpoints
+          // use endpoint from query string parameters if provided
+          queryStringEndpoint = new URLSearchParams(window.location.search).get('endpoint');
+          if (queryStringEndpoint) {
+            URL = queryStringEndpoint
+          }
+          
+          // use user provided enndpoint if entered
           user_api_endpoint = $("#api-endpoint").val();
           if (typeof user_api_endpoint != 'undefined' && user_api_endpoint.length > 0) {
             URL = user_api_endpoint;
