@@ -24,9 +24,9 @@ Today we’re going to create an API for use by DeepRacer officials when choosin
 ### Requirements
 
 - Your own laptop, capable of running a command line and a text editor.
-- Basic knowledge of AWS services ([Amazon S3](https://aws.amazon.com/s3/), [Amazon Athena](https://aws.amazon.com/athena/), [AWS Lambda](https://aws.amazon.com/lambda/), and [Amazon API Gateway](https://aws.amazon.com/api-gateway/))
--	Comfort working on the AWS Console and configuring AWS services
--	Working knowledge of SQL
+- Basic knowledge of these AWS services, though we'll introduce them as we go along: [Amazon S3](https://aws.amazon.com/s3/), [Amazon Athena](https://aws.amazon.com/athena/), [AWS Lambda](https://aws.amazon.com/lambda/), and [Amazon API Gateway](https://aws.amazon.com/api-gateway/).
+-	Basic familarity with the AWS Console and configuring AWS services.
+-	Some knowledge of SQL.
 
 ### Contents
 
@@ -65,13 +65,13 @@ These pieces of code are referenced in the workshop sections, and listed here fo
 
 ### High-level workflow
 
-In this workshop, you will be using various services to create an application that will enable end-users to query an ASDI dataset and determine the city with the temperature closest to 23 degrees Celsius. The process will be following these high-level steps:
+In this workshop, you will be using various services to create an application that will enable users to query an ASDI dataset and determine the city with the temperature closest to 23 degrees Celsius. The process will be following these high-level steps:
 
-1. Create a new AWS S3 bucket that will act as the query repository and hold the city location data 
-1. Create Amazon Athena tables to query the data set
-1. Create an Amazon Lambda function to query Athena
-1. Create an AWS API Gateway endpoint which will call the Lambda
-1. Build a static S3 Website to interface with API Gateway
+1. Create a new AWS S3 bucket that will act as the query repository and hold the city location data.
+1. Create Amazon Athena tables to query the data set.
+1. Create an Amazon Lambda function to call the Athena query.
+1. Create an AWS API Gateway endpoint which will call the Lambda.
+1. Build a static S3 Website, with a basic web page that calls the API Gateway.
 
 <img src="images/architecture.png" alt="Workshop architecture diagram"
 	title="Workshop architecture diagram" style="width:90%" />
