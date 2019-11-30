@@ -30,7 +30,15 @@ Today we’re going to create an API for use by DeepRacer officials when choosin
 
 ### Contents
 
+#### Setup
+
+This workshop uses AWS Event Engine to make it easy to set up a temporary AWS account and get started quickly.
+
+- [Start here: AWS Event Engine setup guide](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/setup.md)
+
 #### Sections
+
+Using your Event Engine account, follow the directions in each section. Do them in order, as they build on each other:
 
 1. [Create an S3 bucket and subdirectories](sections/Section-1-S3.pdf)
 1. [Connecting Athena to the NOAA data repository](sections/Section-2-Athena.pdf)
@@ -39,6 +47,8 @@ Today we’re going to create an API for use by DeepRacer officials when choosin
 1. [Next steps: Customize the Code Green Workshop](sections/Section-5-next-steps-references.pdf)
   
 #### Code
+
+These pieces of code are referenced in the workshop sections, and listed here for your convenience:
 
 - [iam.json](code/iam.json)
 - [lambda-code.py](code/lambda-code.py)
@@ -63,7 +73,7 @@ In this workshop, you will be using various services to create an application th
 1. Create an AWS API Gateway endpoint which will call the Lambda
 1. Build a static S3 Website to interface with API Gateway
 
-<img src="architecture.png" alt="Workshop architecture diagram"
+<img src="images/architecture.png" alt="Workshop architecture diagram"
 	title="Workshop architecture diagram" style="width:90%" />
 <br><br>
   

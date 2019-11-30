@@ -1,5 +1,11 @@
 ## Amazon Sustainability Data Initiative
 
+----
+
+At re:Invent 2019 the Amazon Sustainability Data Initiative, together with AWS Sustainability, is hosting Code Green, a sustainabillty hackathon and workshop for learning about and building on ASDI data. [Learn more here.](https://github.com/awslabs/amazon-asdi/tree/master/code-green)
+
+----
+
 This repo contains docs and supporting material for the [Amazon Sustainability Data Initiative (ASDI)](https://sustainability.aboutamazon.com/tech-for-good/asdi), an initiative to provide access to large datasets in the cloud to help researchers and innovators address a wide range of sustainability challenges.
 
 ## Getting started

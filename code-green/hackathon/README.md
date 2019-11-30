@@ -25,7 +25,7 @@ There are also two Jupyter notebooks in the [notebooks section](https://github.c
 
 #### Submissions
 
-Entries should be submitted as open-source GitHub repos (try [choosealicense.com](https://choosealicense.com/), or just run with GitHub's default [MIT License](https://choosealicense.com/licenses/mit/)). Feel free to include a video, PowerPoint deck, or other supporting material in your repo.
+Entries should be submitted as open-source GitHub repos (try [choosealicense.com](https://choosealicense.com/), or use GitHub's default [MIT License](https://choosealicense.com/licenses/mit/)). Feel free to include a video, PowerPoint deck, or other supporting material in your repo.
 
 
 #### Demos
