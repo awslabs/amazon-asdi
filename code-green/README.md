@@ -1,7 +1,7 @@
 ### HAC201
 ## Code Green: Hacking on Amazon Sustainability Data Initiative datasets
 
-Code Green is both a hackathon and workshop being held Thursday, December 5 from 1-5pm at re:Invent 2019, centered around exploring Amazon Sustainability Data Initiative (ASDI) datasets. Both the hackathon and the workshop will take place in the same space, and attendees can choose which path to follow.
+Code Green is both a **hackathon and workshop being held Thursday, December 5 from 1-5pm at re:Invent 2019**, centered around exploring Amazon Sustainability Data Initiative (ASDI) datasets. Both the hackathon and the workshop will take place in the same space, and attendees can choose which path to follow.
 
 If you're attendeding re:Invent 2019 and want to participate in either the hackathon or the workshop, you can [register here](https://www.portal.reinvent.awsevents.com/connect/sessionDetail.ww?SESSION_ID=99788&csrftkn=3SUA-ISXO-ZSNY-YOY0-5EJH-E7K8-ASEI-D66U).
 
