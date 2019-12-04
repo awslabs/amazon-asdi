@@ -7,40 +7,45 @@
 
 This workshop is one of two tracks offered by **Code Green: Hacking on Amazon Sustainability Data Initiative datasets** at re:Invent 2019. If you'd prefer to compete, [check out the hackathon](https://github.com/awslabs/amazon-asdi/tree/master/code-green/hackathon), which will be held concurrently in the same event space.
 
-In this workshop you'll be building an API, in order to learn about working with ASDI datasets and AWS services. The API has a single call, which queries an ASDI dataset ([GHNC-D](https://registry.opendata.aws/noaa-ghcn/)), and returns the most sustainable location for a sporting event. For the purposes of this workshop that means a location that is neither too hot nor too cold. A fully formed version of the API could be expanded with additional data sources and more sophisticated algorithms to help select the most sustainable location for any kind of event, based on multiple criteria.
-
-This is meant to give you a starting point for exploring sustainability data. Use it to get up and running, then play with the data—what interesting things can you uncover? What other metrics can you look at when determining if a city is the best location for our fictious event? What other ways can you leverage this dataset, and what other data could you use in conjunction with it?
-
 ### The Scenario
 
 The year is 2030, and MLD—Major League DeepRacer—has exploded, and is now the most popular sporting event in America. A series of identical stadiums have been built in different parts of the country to host races. A focus on sustainability has swept the country as well, and sustainability is an important consideration in where championship races are held.
 
-Today we’re going to create an application for use by DeepRacer officials when choosing race locations. The application queries an API, which uses an ASDI dataset to select a city where the race will have the least environmental impact. To save on heating and cooling the competition committee has decided to look for sites where the average daily temperature is closest to 23.0 degrees Celsius. 
+Today we’re going to create an app for use by DeepRacer officials when choosing race locations, to help save on heating and cooling costs. The competition committee has decided to look for sites where the average daily temperature is closest to 23.0 degrees Celsius. Under the hood the app uses an API to query an ASDI dataset ([GHNC-D](https://registry.opendata.aws/noaa-ghcn/)), and then calculate daily averge temperatures in potential race locations.
+
+
+A fully formed version could be expanded with additional data sources and more sophisticated algorithms to help select the most sustainable location for any kind of event, based on multiple criteria. At the end of the workshop we'll talk about how what you'll build today might be expanded and improved.
 
 ### Requirements
 
 - Your own laptop, capable of running a command line and a text editor.
-- Basic knowledge of these AWS services, though we'll introduce them as we go along: [Amazon S3](https://aws.amazon.com/s3/), [Amazon Athena](https://aws.amazon.com/athena/), [AWS Lambda](https://aws.amazon.com/lambda/), and [Amazon API Gateway](https://aws.amazon.com/api-gateway/).
 -	Basic familarity with the AWS Console and configuring AWS services.
 -	Some knowledge of SQL.
 
-### Contents
+
+### High-level workflow
+
+1. Create a new AWS S3 bucket that will act as the query repository and hold the city location data.
+1. Create Amazon Athena tables to query the data set.
+1. Create an Amazon Lambda function to call the Athena query.
+1. Create an AWS API Gateway endpoint which will call the Lambda.
+1. Build a static S3 Website, with a basic web page that calls the API Gateway.
 
 #### Setup
 
-This workshop uses AWS Event Engine to make it easy to set up a temporary AWS account and get started quickly.
+This workshop uses AWS Event Engine to make it easy to set up a temporary AWS account and get started quickly. If you later want to recreate the workshop in your own account there's a [cloudformation template](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/code/completed-workshop.cfn.json) in this repo which will do that automatically.
 
 - [Start here: AWS Event Engine setup guide](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/setup.md)
 
 #### Sections
 
-Using your Event Engine account, follow the directions in each section. Do them in order, as they build on each other:
+Using your Event Engine account, follow the directions in each section below. Go in order, as they build on each other. You may want to download them, as doesn't render links in PDFs.
 
-1. [Create an S3 bucket and subdirectories](sections/Section-1-S3.pdf)
-1. [Connecting Athena to the NOAA data repository](sections/Section-2-Athena.pdf)
-1. [Creating the endpoint and querying Athena](sections/Section-3-APIGW-Lambda.pdf)
-1. [Create an S3 bucket and subdirectories as a webserver](sections/Section-4-S3-web.pdf)
-1. [Next steps: Customize the Code Green Workshop](sections/Section-5-next-steps-references.pdf)
+1. [Create an S3 bucket and subdirectories](sections/Section-1-S3.pdf)  [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-1-S3.pdf)
+1. [Connecting Athena to the NOAA data repository](sections/Section-2-Athena.pdf) [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-2-Athena.pdf)
+1. [Creating the endpoint and querying Athena](sections/Section-3-APIGW-Lambda.pdf) [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-3-APIGW-Lambda.pdf)
+1. [Create an S3 bucket and subdirectories as a webserver](sections/Section-4-S3-web.pdf) [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-4-S3-web.pdf)
+1. [Next steps: Customize the Code Green Workshop](sections/Section-5-next-steps-references.pdf) [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-5-next-steps-references.pdf)
   
 #### Code
 
@@ -52,29 +57,14 @@ These pieces of code are referenced in the workshop sections, and listed here fo
 - [test-event-lambda.json](code/test-event-lambda.json)
 - [index.html](code/index.html)
 - [stadiums_with_stations_global.csv](code/stadiums_with_stations_global.csv)
-  
-### Getting started
 
--	Begin with [Section 1](sections/Section-1-S3.pdf) and progress through the sections in order, as successful completion of each exercise is necessary to complete subsequent sections.
-- As a best practice, as you create new objects in AWS, keep track of what you have created (names of things like S3 buckets, database names, etc) in a notebook or text editor. This will make it easier to refer to these objects in other sections.
--	The workshop uses Event Engine, a tool used for AWS events which will automatically create a correctly-configured temporary account for workshop participants. The account will be automatically cleaned up and deleted after the workshop is over. If you want to recreate the workshop in your own account later, [a CloudFormation template is available](completed-workshop.cfn.json) which will automatically create the completed workshop.
+#### Architecture
 
-### High-level workflow
-
-In this workshop, you will be using various services to create an application that will enable users to query an ASDI dataset and determine the city with the temperature closest to 23 degrees Celsius. The process will be following these high-level steps:
-
-1. Create a new AWS S3 bucket that will act as the query repository and hold the city location data.
-1. Create Amazon Athena tables to query the data set.
-1. Create an Amazon Lambda function to call the Athena query.
-1. Create an AWS API Gateway endpoint which will call the Lambda.
-1. Build a static S3 Website, with a basic web page that calls the API Gateway.
+When you're done, this is what you'll have created:
 
 <img src="images/architecture.png" alt="Workshop architecture diagram"
 	title="Workshop architecture diagram" style="width:90%" />
 <br><br>
-  
-### [Get started!](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/Section-1-S3.pdf)
-
 
 ### Contact
 
