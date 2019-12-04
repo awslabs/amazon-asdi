@@ -51,7 +51,7 @@ These pieces of code are referenced in the workshop sections, and listed here fo
 - [sql-statements.sql](code/sql-statements.sql)
 - [test-event-lambda.json](code/test-event-lambda.json)
 - [index.html](code/index.html)
-- [stadiums-with-stations_global.csv](code/stadiums_with_stations_global.csv)
+- [stadiums_with_stations_global.csv](code/stadiums_with_stations_global.csv)
   
 ### Getting started
 

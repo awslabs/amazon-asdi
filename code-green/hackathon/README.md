@@ -5,8 +5,6 @@
 
 The Code Green Hackathon is one of two tracks offered during **Code Green: Hacking on Amazon Sustainability Data Initiative datasets** at re:Invent 2019. If you're interested in participating in Code Green but don't want to compete, check out [the workshop](https://github.com/awslabs/amazon-asdi/tree/master/code-green/workshop), which will be held concurrently in the same event space.
 
-If you're attendeding re:Invent 2019 and want to participate in either the hackathon or the workshop, you can [register here](https://www.portal.reinvent.awsevents.com/connect/sessionDetail.ww?SESSION_ID=99788&csrftkn=3SUA-ISXO-ZSNY-YOY0-5EJH-E7K8-ASEI-D66U).
-
 #### Teams
 
 Hackathon teams can consist of individuals, or groups of two to five. No more than two AWS employees can work on any one team.
