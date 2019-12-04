@@ -29,4 +29,4 @@ Click the ‘Open AWS Console’ button to open the AWS Console. You can ignore 
 	title="Event Engine Screenshot 4" style="width:90%" />
 <br><br>
 
-You can now close this tab, head straight to [the first section of the workshop](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/Section-1-S3.pdf), and get started!
+You can now close this tab, head straight to <a href="https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/Section-1-S3.pdf" target="_blank">the first section of the workshop</a>, and get started!
