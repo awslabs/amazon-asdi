@@ -39,7 +39,7 @@ This workshop uses AWS Event Engine to make it easy to set up a temporary AWS ac
 
 #### Sections
 
-Using your Event Engine account, follow the directions in each section below. Go in order, as they build on each other. You may want to download them, as doesn't render links in PDFs.
+Using your Event Engine account, follow the directions in each section below. Go in order, as they build on each other. You may want to download the PDF files, as GitHub doesn't render links in PDFs.
 
 1. [Create an S3 bucket and subdirectories](sections/Section-1-S3.pdf)  [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-1-S3.pdf)
 1. [Connecting Athena to the NOAA data repository](sections/Section-2-Athena.pdf) [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-2-Athena.pdf)
