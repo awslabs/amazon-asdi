@@ -13,8 +13,7 @@ The year is 2030, and MLD—Major League DeepRacer—has exploded, and is now th
 
 Today we’re going to create an app for use by DeepRacer officials when choosing race locations, to help save on heating and cooling costs. The competition committee has decided to look for sites where the average daily temperature is closest to 23.0 degrees Celsius. Under the hood the app uses an API to query an ASDI dataset ([GHNC-D](https://registry.opendata.aws/noaa-ghcn/)), and then calculate daily averge temperatures in potential race locations.
 
-
-A fully formed version could be expanded with additional data sources and more sophisticated algorithms to help select the most sustainable location for any kind of event, based on multiple criteria. At the end of the workshop we'll talk about how what you'll build today might be expanded and improved.
+A fully formed version could be expanded with additional data sources and more sophisticated algorithms to help select the most sustainable location for any kind of event, based on multiple criteria. At the end of the workshop we'll talk about how what you build today might be expanded and improved.
 
 ### Requirements
 
@@ -58,22 +57,14 @@ These pieces of code are referenced in the workshop sections, and listed here fo
 - [index.html](code/index.html)
 - [stadiums_with_stations_global.csv](code/stadiums_with_stations_global.csv)
 
-#### Architecture
-
-When you're done, this is what you'll have created:
-
-<img src="images/architecture.png" alt="Workshop architecture diagram"
-	title="Workshop architecture diagram" style="width:90%" />
-<br><br>
-
-#### Do it for me Mode
+#### Do it for me mode
 
 <details>
-	<summary>Run short on time or just want it done for your? click here</summary>
+	<summary>Follow these steps to automatically create a finished version of this workshop.</summary>
 
-Follow these steps to automatically create a finished version of this workshop.
+The repo includes a CloudFormation script ([here](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/code/completed-workshop.cfn.json)) which will automatically set up all the infrastructure that you would otherwise manually create in this workshop. Follow these steps:
 
-* Click to [launch CloudFormation stack](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://s3.amazonaws.com/code-green-asdi/templates/completed-workshop.cfn.json)
+* Click to [launch CloudFormation stack](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://s3.amazonaws.com/code-green-asdi/templates/completed-workshop.cfn.json). This will automatically load the script from this repo into CloudFormation and ask you for the info necessary to run it.
 * Enter "CodeGreenWorkshop" as the stack name (or any other descriptive name)
 * Check "I acknowledge that AWS CloudFormation might create IAM resources" near bottom of page
 * Click "Create Stack" button at bottom of page
@@ -82,6 +73,14 @@ Follow these steps to automatically create a finished version of this workshop.
 * Click on the "Outputs" tab.  The "Website URL" output has a clickable link you can use to run the query against the infrastructure you just created.
 
 </details>
+
+#### Architecture
+
+When you're done, this is what you'll have created:
+
+<img src="images/architecture.png" alt="Workshop architecture diagram"
+	title="Workshop architecture diagram" style="width:90%" />
+<br><br>
 
 ### Contact
 
