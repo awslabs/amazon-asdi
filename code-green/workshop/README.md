@@ -66,13 +66,12 @@ When you're done, this is what you'll have created:
 	title="Workshop architecture diagram" style="width:90%" />
 <br><br>
 
-#### Shortcut to the End
-
-If you encounter issues or run short on time and want to jump to the end, we have you covered.
-
+#### Do it for me Mode
 
 <details>
-	<summary>Expand here to jump to the end</summary>
+	<summary>Run short on time or just want it done for your? click here</summary>
+
+Follow these steps to automatically create a finished version of this workshop.
 
 * Click to [launch CloudFormation stack](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://s3.amazonaws.com/code-green-asdi/templates/completed-workshop.cfn.json)
 * Enter "CodeGreenWorkshop" as the stack name (or any other descriptive name)
