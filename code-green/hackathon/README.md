@@ -21,6 +21,8 @@ To help you get started you can check out this [overview of suitable climate and
 
 There are also two Jupyter notebooks in the [notebooks section](https://github.com/awslabs/amazon-asdi/tree/master/code-green/notebooks) of this repo that have been put together by ASDI, and links to relevant third-party notebooks, to make it easier to get rolling with some of the datasets.
 
+You may find [GDAL library](https://gdal.org/index.html) helpful for working with many of the data sets.  It is available with a Python, Java, C, and C++ API.
+
 #### Submissions
 
 Entries should be submitted as open-source GitHub repos (try [choosealicense.com](https://choosealicense.com/), or use GitHub's default [MIT License](https://choosealicense.com/licenses/mit/)). Feel free to include a video, PowerPoint deck, or other supporting material in your repo.
