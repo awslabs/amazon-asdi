@@ -66,6 +66,23 @@ When you're done, this is what you'll have created:
 	title="Workshop architecture diagram" style="width:90%" />
 <br><br>
 
+#### Do it for me Mode
+
+<details>
+	<summary>Run short on time or just want it done for your? click here</summary>
+
+Follow these steps to automatically create a finished version of this workshop.
+
+* Click to [launch CloudFormation stack](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://s3.amazonaws.com/code-green-asdi/templates/completed-workshop.cfn.json)
+* Enter "CodeGreenWorkshop" as the stack name (or any other descriptive name)
+* Check "I acknowledge that AWS CloudFormation might create IAM resources" near bottom of page
+* Click "Create Stack" button at bottom of page
+* Wait for stack to show "Create Complete" on left side of screen.  This may take a few minutes. There is a refresh button next to "Stacks"
+* Click on the "Resources" table to explore the resources that CloudFormation created for you
+* Click on the "Outputs" tab.  The "Website URL" output has a clickable link you can use to run the query against the infrastructure you just created.
+
+</details>
+
 ### Contact
 
 If you have questions, corrections, suggestions, or reflections, please contact [sustainability-data-initiative@amazon.com](mailto:sustainability-data-initiative@amazon.com)
