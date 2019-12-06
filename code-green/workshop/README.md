@@ -32,13 +32,15 @@ A fully formed version could be expanded with additional data sources and more s
 
 #### Setup
 
-This workshop uses AWS Event Engine to make it easy to set up a temporary AWS account and get started quickly. If you later want to recreate the workshop in your own account there's a [cloudformation template](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/code/completed-workshop.cfn.json) in this repo which will do that automatically.
+When done at AWS events this workshop uses AWS Event Engine to make it easy to set up a temporary AWS account and get started quickly. If you later want to recreate the workshop in your own account there's a [cloudformation template](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/code/completed-workshop.cfn.json) in this repo which will do that automatically.
 
 - [Start here: AWS Event Engine setup guide](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/setup.md)
 
+When doing the workshop on your own you'll need to use a personal account.
+
 #### Sections
 
-Using your Event Engine account, follow the directions in each section below. Go in order, as they build on each other. You may want to download the PDF files, as GitHub doesn't render links in PDFs.
+Once you've logged into either your Event Engine or personal account, follow the directions in each section below. Go in order, as they build on each other. You may want to download the PDF files, as GitHub doesn't render links in PDFs.
 
 1. [Create an S3 bucket and subdirectories](sections/Section-1-S3.pdf)  [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-1-S3.pdf)
 1. [Connecting Athena to the NOAA data repository](sections/Section-2-Athena.pdf) [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-2-Athena.pdf)
@@ -48,7 +50,7 @@ Using your Event Engine account, follow the directions in each section below. Go
   
 #### Code
 
-These pieces of code are referenced in the workshop sections, and listed here for your convenience:
+These code samples are referenced in the workshop, and listed here for your convenience:
 
 - [iam.json](code/iam.json)
 - [lambda-code.py](code/lambda-code.py)
@@ -62,7 +64,7 @@ These pieces of code are referenced in the workshop sections, and listed here fo
 <details>
 	<summary>Follow these steps to automatically create a finished version of this workshop.</summary>
 
-The repo includes a CloudFormation script ([here](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/code/completed-workshop.cfn.json)) which will automatically set up all the infrastructure that you would otherwise manually create in this workshop. Follow these steps:
+The repo includes a CloudFormation script ([here](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/code/completed-workshop.cfn.json)), which will automatically set up all the infrastructure that you would otherwise manually create in this workshop. Follow these steps:
 
 * Click to [launch CloudFormation stack](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://s3.amazonaws.com/code-green-asdi/templates/completed-workshop.cfn.json). This will automatically load the script from this repo into CloudFormation and ask you for the info necessary to run it.
 * Enter "CodeGreenWorkshop" as the stack name (or any other descriptive name)
