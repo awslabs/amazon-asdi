@@ -11,18 +11,22 @@ In this section you will create a storage bucket and associated folders necessar
 1. Log in to the AWS console and set your region to N. Virginia.
 
     <kbd><img src="images/image1-1.png" alt="Screenshot of console front page" /></kbd>
+    <br/><br/>
 
 1. In the "Find Services" field search for S3 and navigate to the S3 dashboard, then click on "Create bucket". All S3 buckets must have a globally unique name and must comply with DNS naming conventions—generally you should use lowercase letters and no underscores ([more information](https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html)). Select the region N. Virginia, enter a unique bucket name, and click "Next".
 
     <kbd><img src="images/image1-2.png" alt="Screenshot 1-2" /></kbd>
+    <br/><br/>
   
 1. Add a tag with "project" as the key and "AWS-CodeGreen-Hackathon" as the value, and click "Next".
 
     <kbd><img src="images/image1-3.png" alt="Screenshot 1-3" /></kbd>
+    <br/><br/>
 
 1. You don’t need this bucket to be publicly available, so accept the default ("Block _all_ public access") and click "Next".
 
     <kbd><img src="images/image1-4.png" alt="Screenshot 1-4" /></kbd>
+    <br/><br/>
 
 1. Click "Create bucket".
 
@@ -33,6 +37,7 @@ In this section you will create a storage bucket and associated folders necessar
 1. Click on "Create folder," then type "query-results" next to the folder icon. Accept the default encryption settings ("None") and click "Save".
 
     <kbd><img src="images/image1-8.png" alt="Screenshot 1-8" /></kbd>
+    <br/><br/>
 
 1. Repeat this process to create a folder named "stadium-data".
 
@@ -43,14 +48,17 @@ In this section you will create a storage bucket and associated folders necessar
 1. Since the query-results folder will be used to temporarily store results from our Athena queries, you will want to create a [lifecycle policy](https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html) to delete these files when they are no longer necessary. Start by clicking on the "Management" tab.
 
     <kbd><img src="images/image1-12.png" alt="Screenshot 1-12" /></kbd>
+    <br/><br/>
 
 1. With the Lifecycle tab highlighted, click the "Add lifecycle rule" button.
 
     <kbd><img src="images/image1-13.png" alt="Screenshot 1-13" /></kbd>
+    <br/><br/>
 
 1. In the rule name field type "Expire Athena query results". In the prefix/tags field type the folder you created for the Athena query results followed by a slash ("query-results/"), select prefix, then click "Next".
 
     <kbd><img src="images/image1-14.png" alt="Screenshot 1-14" /></kbd>
+    <br/><br/>
 
 1. On the "Transitions" pane leave the two boxes for "Current version" and "Previous version" unchecked (we are not moving files to other S3 storage classes), and click "Next".
 
