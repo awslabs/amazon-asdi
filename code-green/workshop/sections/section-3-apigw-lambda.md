@@ -162,14 +162,17 @@ Our Lambda will issue a query against the Athena database created in the previou
         ## override defaults with Environment variables if available
         if ’GLUE_DATABASE’ in os.environ:
             athenaDatabase = os.environ[’GLUE_DATABASE’]
+
         if ’S3_QUERY_OUTPUT_LOCATION’ in os.environ:
             S3_OUTPUT = os.environ[’S3_QUERY_OUTPUT_LOCATION’
         else:
             S3_OUTPUT = ’s3://’ + S3_BUCKET + ’/’ + S3_QUERY
+
         if ’GHCN_TABL_NAME’ in os.environ:
             GHCN_TABLE_NAME = os.environ[’GHCN_TABLE_NAME’]
         else:
             GHCN_TABLE_NAME = ’ghcntable’
+
         if ’STADIUM_TABLE_NAME’ in os.environ:
             STADIUM_TABLE_NAME = os.environ[’STADIUM_TABLE_NAME’]
         else:
@@ -190,9 +193,9 @@ Our Lambda will issue a query against the Athena database created in the previou
                 lookbackDays = int(event[’queryStringParameters’][’days’])
             except:
                 lookbackDays = DEFAULT_DATE_HISTORY
-
             if (lookbackDays < DEFAULT_MIN_LOOKBACK):
                 lookbackDays = DEFAULT_MIN_LOOKBACK
+
             dateObj = datetime.date.today() - datetime.timedelta(days=lookbackDays)
             queryDate = int(dateObj.strftime(’%Y%m%d’))
 
