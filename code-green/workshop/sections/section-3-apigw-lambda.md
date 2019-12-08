@@ -159,7 +159,7 @@ Our Lambda will issue a query against the Athena database created in the previou
         # number of retries
         RETRY_COUNT = 15
 
-        ## override defaults with Environment variables if available
+        # set additional defaults or override with environment variables if present
         if ’GLUE_DATABASE’ in os.environ:
             athenaDatabase = os.environ[’GLUE_DATABASE’]
 
@@ -178,6 +178,7 @@ Our Lambda will issue a query against the Athena database created in the previou
         else:
             STADIUM_TABLE_NAME = ’stadium’
 
+        # the lambda itself
         def lambda_handler(event, context):
             try:
                 city = event[’queryStringParameters’][’cities’]
