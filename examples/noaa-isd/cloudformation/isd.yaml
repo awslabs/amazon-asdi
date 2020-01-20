@@ -1,0 +1,331 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This runs Sagemaker for a Jupyter notebook to work with the NOAA ISD open dataset.
+Resources:
+ 
+    ExecutionRole: 
+        Type: "AWS::IAM::Role"
+        Properties: 
+          AssumeRolePolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Principal: 
+                  Service: 
+                    - "sagemaker.amazonaws.com"
+                Action: 
+                  - "sts:AssumeRole"
+          Path: "/"
+          ManagedPolicyArns: 
+            - "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess"
+            - "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
+            - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+
+    NotebookLifecycleConfig:
+        Type: AWS::SageMaker::NotebookInstanceLifecycleConfig
+        Properties:
+            OnCreate:
+            - Content:
+                Fn::Base64: |
+                    #!/bin/sh
+
+                    set -e
+                    sudo -u ec2-user -i <<'EOF'
+
+                    source activate python3
+                    nohup python3 -m pip install PyAthena >/home/ec2-user/pip.log &
+                    nohup conda update -n base -c defaults conda -y
+                    nohup conda install -c anaconda basemap proj4 -y
+                    source deactivate
+
+                    EOF
+
+
+    NotebookRepository:
+        Type: AWS::SageMaker::CodeRepository
+        Properties:
+            GitConfig:
+                RepositoryUrl: "https://github.com/awslabs/amazon-asdi"
+                Branch: "isd"
+
+    NotebookInstance:
+        Type: "AWS::SageMaker::NotebookInstance"
+        Properties:
+            NotebookInstanceName: !Join
+            - ''
+            - - ISD-
+              - !Select
+                - 6
+                - !Split
+                  - '-'
+                  - !Ref 'AWS::StackId'
+            InstanceType: "ml.c5.xlarge"
+            DefaultCodeRepository: !GetAtt NotebookRepository.CodeRepositoryName
+            RoleArn: !GetAtt ExecutionRole.Arn
+            LifecycleConfigName:  !GetAtt NotebookLifecycleConfig.NotebookInstanceLifecycleConfigName
+
+    ISDDatabase:
+        Type: "AWS::Glue::Database"
+        Properties:
+            DatabaseInput:
+                Description: The NOAA ISD Database
+                Name: "noaaisd"
+            CatalogId: !Ref AWS::AccountId
+    
+    ISDTable:
+        Type: "AWS::Glue::Table"
+        Properties:
+            TableInput: 
+                Name: isd
+                PartitionKeys:
+                    - Name: year
+                      Type: string
+                StorageDescriptor:
+                    InputFormat: org.apache.hadoop.mapred.TextInputFormat
+                    OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+                    StoredAsSubDirectories: False
+                    Location: s3://noaa-isd-pds/data/
+                    SerdeInfo:
+                        SerializationLibrary: org.apache.hadoop.hive.serde2.RegexSerDe
+                        Parameters:
+                            input.regex: "(.{4})(.{6})(.{5})(.{8})(.{4})(.{1})(.{6})(.{7})(.{5})(.{5})(.{5})(.{4})(.{3})(.{1})(.{1})(.{4})(.{1})(.{5})(.{1})(.{1})(.{1})(.{6})(.{1})(.{1})(.{1})(.{5})(.{1})(.{5})(.{1})(.{5})(.{1}).*"
+                    Columns:
+                    - Name: tot_var_chars
+                      Type: string
+                    - Name: cat_id
+                      Type: string
+                    - Name: wban
+                      Type: string
+                    - Name: obs_date
+                      Type: string
+                    - Name: obs_time
+                      Type: string
+                    - Name: obs_data_source
+                      Type: string
+                    - Name: obs_latitude
+                      Type: float
+                    - Name: obs_longitude
+                      Type: float
+                    - Name: report_code
+                      Type: string
+                    - Name: obs_elevation
+                      Type: string
+                    - Name: station_call
+                      Type: string
+                    - Name: quality_control
+                      Type: string
+                    - Name: wind_dir_angle
+                      Type: float
+                    - Name: wind_dir_quality
+                      Type: string
+                    - Name: wind_type
+                      Type: string
+                    - Name: wind_speed_rate
+                      Type: string
+                    - Name: wind_speed_quality
+                      Type: string
+                    - Name: sky_ceiling
+                      Type: string
+                    - Name: sky_ceiling_quality
+                      Type: string
+                    - Name: sky_ceiling_determination
+                      Type: string
+                    - Name: sky_cavok
+                      Type: string
+                    - Name: vis_distance
+                      Type: string
+                    - Name: vis_distance_quality
+                      Type: string
+                    - Name: vis_variability
+                      Type: string
+                    - Name: vis_variability_quality
+                      Type: string
+                    - Name: air_temp
+                      Type: float
+                    - Name: air_temp_quality
+                      Type: string
+                    - Name: air_dewpoint_temp
+                      Type: float
+                    - Name: air_dewpoint_temp_quality
+                      Type: string
+                    - Name: air_pres_msl
+                      Type: float
+                    - Name: air_pres_msl_quality
+                      Type: string
+            DatabaseName: !Ref ISDDatabase
+            CatalogId: !Ref AWS::AccountId
+
+    ISDPartition2018:
+        Type: AWS::Glue::Partition
+        Properties:
+            CatalogId: !Ref AWS::AccountId
+            DatabaseName: !Ref ISDDatabase
+            TableName: !Ref ISDTable
+            PartitionInput:
+                Values:
+                    - "2018"
+                StorageDescriptor:
+                    InputFormat: org.apache.hadoop.mapred.TextInputFormat
+                    OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+                    StoredAsSubDirectories: False
+                    Location: s3://noaa-isd-pds/data/2018/
+                    SerdeInfo:
+                        SerializationLibrary: org.apache.hadoop.hive.serde2.RegexSerDe
+                        Parameters:
+                            input.regex: "(.{4})(.{6})(.{5})(.{8})(.{4})(.{1})(.{6})(.{7})(.{5})(.{5})(.{5})(.{4})(.{3})(.{1})(.{1})(.{4})(.{1})(.{5})(.{1})(.{1})(.{1})(.{6})(.{1})(.{1})(.{1})(.{5})(.{1})(.{5})(.{1})(.{5})(.{1}).*"
+                    Columns:
+                    - Name: tot_var_chars
+                      Type: string
+                    - Name: cat_id
+                      Type: string
+                    - Name: wban
+                      Type: string
+                    - Name: obs_date
+                      Type: string
+                    - Name: obs_time
+                      Type: string
+                    - Name: obs_data_source
+                      Type: string
+                    - Name: obs_latitude
+                      Type: float
+                    - Name: obs_longitude
+                      Type: float
+                    - Name: report_code
+                      Type: string
+                    - Name: obs_elevation
+                      Type: string
+                    - Name: station_call
+                      Type: string
+                    - Name: quality_control
+                      Type: string
+                    - Name: wind_dir_angle
+                      Type: float
+                    - Name: wind_dir_quality
+                      Type: string
+                    - Name: wind_type
+                      Type: string
+                    - Name: wind_speed_rate
+                      Type: string
+                    - Name: wind_speed_quality
+                      Type: string
+                    - Name: sky_ceiling
+                      Type: string
+                    - Name: sky_ceiling_quality
+                      Type: string
+                    - Name: sky_ceiling_determination
+                      Type: string
+                    - Name: sky_cavok
+                      Type: string
+                    - Name: vis_distance
+                      Type: string
+                    - Name: vis_distance_quality
+                      Type: string
+                    - Name: vis_variability
+                      Type: string
+                    - Name: vis_variability_quality
+                      Type: string
+                    - Name: air_temp
+                      Type: float
+                    - Name: air_temp_quality
+                      Type: string
+                    - Name: air_dewpoint_temp
+                      Type: float
+                    - Name: air_dewpoint_temp_quality
+                      Type: string
+                    - Name: air_pres_msl
+                      Type: float
+                    - Name: air_pres_msl_quality
+                      Type: string
+
+    ISDPartition2019:
+        Type: AWS::Glue::Partition
+        Properties:
+            CatalogId: !Ref AWS::AccountId
+            DatabaseName: !Ref ISDDatabase
+            TableName: !Ref ISDTable
+            PartitionInput:
+                Values:
+                    - "2019"
+                StorageDescriptor:
+                    InputFormat: org.apache.hadoop.mapred.TextInputFormat
+                    OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+                    StoredAsSubDirectories: False
+                    Location: s3://noaa-isd-pds/data/2019/
+                    SerdeInfo:
+                        SerializationLibrary: org.apache.hadoop.hive.serde2.RegexSerDe
+                        Parameters:
+                            input.regex: "(.{4})(.{6})(.{5})(.{8})(.{4})(.{1})(.{6})(.{7})(.{5})(.{5})(.{5})(.{4})(.{3})(.{1})(.{1})(.{4})(.{1})(.{5})(.{1})(.{1})(.{1})(.{6})(.{1})(.{1})(.{1})(.{5})(.{1})(.{5})(.{1})(.{5})(.{1}).*"
+                    Columns:
+                    - Name: tot_var_chars
+                      Type: string
+                    - Name: cat_id
+                      Type: string
+                    - Name: wban
+                      Type: string
+                    - Name: obs_date
+                      Type: string
+                    - Name: obs_time
+                      Type: string
+                    - Name: obs_data_source
+                      Type: string
+                    - Name: obs_latitude
+                      Type: float
+                    - Name: obs_longitude
+                      Type: float
+                    - Name: report_code
+                      Type: string
+                    - Name: obs_elevation
+                      Type: string
+                    - Name: station_call
+                      Type: string
+                    - Name: quality_control
+                      Type: string
+                    - Name: wind_dir_angle
+                      Type: float
+                    - Name: wind_dir_quality
+                      Type: string
+                    - Name: wind_type
+                      Type: string
+                    - Name: wind_speed_rate
+                      Type: string
+                    - Name: wind_speed_quality
+                      Type: string
+                    - Name: sky_ceiling
+                      Type: string
+                    - Name: sky_ceiling_quality
+                      Type: string
+                    - Name: sky_ceiling_determination
+                      Type: string
+                    - Name: sky_cavok
+                      Type: string
+                    - Name: vis_distance
+                      Type: string
+                    - Name: vis_distance_quality
+                      Type: string
+                    - Name: vis_variability
+                      Type: string
+                    - Name: vis_variability_quality
+                      Type: string
+                    - Name: air_temp
+                      Type: float
+                    - Name: air_temp_quality
+                      Type: string
+                    - Name: air_dewpoint_temp
+                      Type: float
+                    - Name: air_dewpoint_temp_quality
+                      Type: string
+                    - Name: air_pres_msl
+                      Type: float
+                    - Name: air_pres_msl_quality
+                      Type: string
+    
+Outputs:
+    JupyterNotebook:
+        Value: !Join
+        - ''
+        - - https://
+          - !Ref 'AWS::Region'
+          - .console.aws.amazon.com/sagemaker/home?region=
+          - !Ref 'AWS::Region'
+          - '#/notebook-instances/openNotebook/'
+          - !GetAtt 'NotebookInstance.NotebookInstanceName'
