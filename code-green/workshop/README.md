@@ -42,12 +42,12 @@ When doing the workshop on your own you'll need to use a personal account.
 
 Once you've logged into either your Event Engine or personal account, follow the directions in each section below. Go in order, as they build on each other. You may want to download the PDF files, as GitHub doesn't render links in PDFs.
 
-1. [Create an S3 bucket and subdirectories](sections/Section-1-S3.pdf)  [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-1-S3.pdf)
-1. [Connecting Athena to the NOAA data repository](sections/Section-2-Athena.pdf) [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-2-Athena.pdf)
-1. [Creating the endpoint and querying Athena](sections/Section-3-APIGW-Lambda.pdf) [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-3-APIGW-Lambda.pdf)
-1. [Create an S3 bucket and subdirectories as a webserver](sections/Section-4-S3-web.pdf) [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-4-S3-web.pdf)
-1. [Next steps: Customize the Code Green Workshop](sections/Section-5-next-steps-references.pdf) [(download)](https://github.com/awslabs/amazon-asdi/raw/master/code-green/workshop/sections/Section-5-next-steps-references.pdf)
-  
+1. [Create an S3 bucket and subdirectories](sections/Section-1-S3.pdf)  [(download)](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/section-1-s3.md)
+1. [Connecting Athena to the NOAA data repository](sections/Section-2-Athena.pdf) [(download)](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/section-2-athena.md)
+1. [Creating the endpoint and querying Athena](sections/Section-3-APIGW-Lambda.pdf) [(download)](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/section-3-apigw-lambda.md)
+1. [Create an S3 bucket and subdirectories as a webserver](sections/Section-4-S3-web.pdf) [(download)](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/section-4-s3-web.md)
+1. [Next steps: Customize the Code Green Workshop](sections/Section-5-next-steps-references.pdf) [(download)](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/section-5-next-steps.md)
+
 #### Code
 
 These code samples are referenced in the workshop, and listed here for your convenience:
