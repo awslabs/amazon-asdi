@@ -47,16 +47,16 @@ The SQL statements we’ll be using can be found in the workshop GitHub repo in 
          s_flag string,
          obs_time string)
         ROW FORMAT DELIMITED
-         FIELDS TERMINATED BY ’,’
+         FIELDS TERMINATED BY ','
         STORED AS INPUTFORMAT
-         ’org.apache.hadoop.mapred.TextInputFormat’
+         'org.apache.hadoop.mapred.TextInputFormat'
         OUTPUTFORMAT
-         ’org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat’
+         'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
         LOCATION
-         ’s3://noaa-ghcn-pds/csv’
+         's3://noaa-ghcn-pds/csv'
         TBLPROPERTIES (
-         ’has_encrypted_data’=’false’,
-         ’transient_lastDdlTime’=’1572285230’)
+         'has_encrypted_data'='false',
+         'transient_lastDdlTime'='1572285230')
 
     Note that the columns created in that query (id, year\_date, element, etc) correspond to row values in the CSV files where this data is stored in S3. For example [this record of all ghcn-d values in 2019](http://noaa-ghcn-pds.s3.amazonaws.com/csv/2019.csv) (warning: it’s 1GB) has rows that look like this:
 
