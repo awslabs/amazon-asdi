@@ -127,9 +127,9 @@ The SQL statements we’ll be using can be found in the workshop GitHub repo in 
         FROM stadium
         INNER JOIN ghcntable
         ON stadium.station_id = ghcntable.id
-        WHERE ghcntable.year_date >= ’20191029’
+        WHERE ghcntable.year_date >= '20191029'
         AND (
-          ghcntable.element = ’TMIN’ OR ghcntable.element = ’TMAX’)
+          ghcntable.element = 'TMIN' OR ghcntable.element = 'TMAX')
 
 1. Click "Run Query", and after about 15 seconds you should see the results of the query. If so, you just successfully accessed an Amazon Sustainability Data Initiative dataset, and joined it across data in a different S3 bucket. Congratulations!
 
