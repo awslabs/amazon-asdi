@@ -2,7 +2,7 @@
 
 If you have `git` installed, it's a good idea to clone the workshop repo so you have the files on your local machine. Navigate to where you want to put the workshop directory, then run this on the command line:
 
-`git clone git@github.com:awslabs/amazon-asdi.git; cd amazon-asdi`
+`git clone https://github.com/awslabs/amazon-asdi.git; cd amazon-asdi`
 
 ## Create your AWS Event Engine account
 
