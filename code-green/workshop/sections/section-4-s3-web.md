@@ -85,4 +85,4 @@ In this section, you will create another S3 bucket, this one to host static webs
 
 In this section, you created an S3 bucket to serve the static website which utilizes the application you built over the course of this workshop.
 
-You’ve now completed the 4th and final section of the workshop—congratulations! Now that you’re done, explore some optional [next steps and useful links](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/Section-5-next-steps-references.pdf) to see how you can build on what you’ve created here.
+You’ve now completed the 4th and final section of the workshop—congratulations! Now that you’re done, explore some optional <b style="text-decoration: underline;">[next steps and useful links](section-5-next-steps.md)</a> to see how you can build on what you’ve created here.

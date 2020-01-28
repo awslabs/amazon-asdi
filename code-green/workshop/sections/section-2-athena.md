@@ -35,7 +35,7 @@ The SQL statements we’ll be using can be found in the workshop GitHub repo in 
 
 1. Click "Run Query". You should see a confirmation in the Results section of "Query successful". You now have a database into which you can put the table we’re about to create.
 
-1. On the left-hand side change the database to the one you just created ("ghcn"), then in the tab above th4 query pane click the "+" sign to create a new query. Paste the query below into the query editor.
+1. On the left-hand side change the database to the one you just created ("ghcn"), then in the tab above the query pane click the "+" sign to create a new query. Paste the query below into the query editor.
 
         CREATE EXTERNAL TABLE ghcntable(
          id string,
@@ -135,4 +135,6 @@ The SQL statements we’ll be using can be found in the workshop GitHub repo in 
 
 In this section you created an Athena database, with two tables. One, the stadium table, was built using Glue and a CSV file in an S3 bucket you created. The other table was created with a SQL statement, referencing another S3 bucket, in a different account. That S3 bucket is updated daily with new weather data for its global sensors.
 
-You’ve now completed section 2 of the workshop and can move on to the next section, "[Creating the endpoint and querying Athena](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/section-3-apigw-lambda.md)."
+You’ve now completed section 2 of the workshop and can move on to section 3,
+<br /><br />
+→ <b style="text-decoration: underline;">[Creating the endpoint and querying Athena](section-3-apigw-lambda.md)</b>.

@@ -31,7 +31,7 @@ Our Lambda will issue a query against the Athena database created in the previou
     <kbd><img src="images/image3-4.png" alt="Screenshot 3-4" /></kbd>
     <br/><br/>
 
-1. Click on "Create policy", then click on the JSON tab. Remove the template text in the JSON editor. The code directory contains a file, [json](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/code/iam.json), that has the IAM policy document you will be using for this step (if you copy from below, be careful to remove any extraneous text that may get copied from the page break). Replace YOUR_BUCKET_NAME with the name of the S3 bucket you created in Section 1, then paste in the Athena workgroup ARN you set aside above in step 3, replacing YOUR_ATHENA_ARN. Both of these areas are highlighted below.
+1. Click on "Create policy", then click on the JSON tab. Remove the template text in the JSON editor. The code directory contains a json file, (<b style="text-decoration: underline;">[view it here](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/code/iam.json)</b>), that has the IAM policy document you will be using for this step (if you copy from below, be careful to remove any extraneous text that may get copied from the page break). Replace YOUR_BUCKET_NAME with the name of the S3 bucket you created in Section 1, then paste in the Athena workgroup ARN you set aside above in step 3, replacing YOUR_ATHENA_ARN. Both of these areas are highlighted below.
 
 
         {
@@ -388,7 +388,8 @@ Our Lambda will issue a query against the Athena database created in the previou
 
 In this section you created an API Gateway with an ANY method, and created a Lambda to be triggered by that method. That Lambda queries the Athena table you created in Section 2 and returns the results to the user.
 
-You’ve now completed section 3 of the workshop and can move on to the next section, "[Create S3 bucket and subdirectories as a webserver](https://github.com/awslabs/amazon-asdi/blob/master/code-green/workshop/sections/section-4-s3-web.md)."
+You’ve now completed section 3 of the workshop and can move on to section 4:<br /><br />
+→ <b style="text-decoration: underline;">[Create S3 bucket and subdirectories as a webserver](section-4-s3-web.md).</b>
 
 
 
