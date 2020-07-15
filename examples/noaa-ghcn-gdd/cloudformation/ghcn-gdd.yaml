@@ -1,0 +1,157 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This sets up Glue, Athena, and Quicksight for analyzing growing degree days from the NOAA GHCN dataset.
+
+Parameters:
+  GHCNStation:
+    Type: String
+    Description: The GHCN station to examine
+    Default: CA005021220
+
+
+Resources:
+
+    GHCNDatabase:
+        Type: "AWS::Glue::Database"
+        Properties:
+            DatabaseInput:
+                Description: The NOAA GHCN Database
+                Name: "ghcndag"
+            CatalogId: !Ref AWS::AccountId
+    
+    GHCNTable:
+        Type: "AWS::Glue::Table"
+        Properties:
+            TableInput: 
+                Name: tblallyears
+                TableType: EXTERNAL_TABLE
+                StorageDescriptor:
+                    InputFormat: org.apache.hadoop.mapred.TextInputFormat
+                    OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+                    StoredAsSubDirectories: False
+                    Location: s3://noaa-ghcn-pds/csv/
+                    SerdeInfo:
+                      Parameters:
+                        field.delim: ","
+                      SerializationLibrary: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+                    Columns:
+                    - Name: id
+                      Type: string
+                    - Name: year_date
+                      Type: string
+                    - Name: element
+                      Type: string
+                    - Name: data_value
+                      Type: string
+                    - Name: m_flag
+                      Type: string
+                    - Name: q_flag
+                      Type: string
+                    - Name: s_flag
+                      Type: string
+                    - Name: obs_time
+                      Type: string
+            DatabaseName: !Ref GHCNDatabase
+            CatalogId: !Ref AWS::AccountId
+  
+
+    PRCP:
+      Type: AWS::Athena::NamedQuery
+      Properties:
+        Database: !Ref GHCNDatabase
+        Description: "A query to create a table for precipitation"
+        Name: !Sub "${GHCNStation}_PRCP"
+        QueryString: !Sub >
+          CREATE TABLE ${GHCNDatabase}.${GHCNStation}_PRCP
+          WITH (
+            format='PARQUET'
+          ) AS 
+          SELECT 
+          id, 
+          element, 
+          CAST(data_value AS REAL)/10 AS value, 
+          year_date, 
+          SUBSTR(year_date,1,4) AS year, 
+          SUBSTR(year_date,5,2)||'-'|| SUBSTR(year_date,7,2) AS month_day,
+          SUBSTR(year_date,5,2) AS month,
+          SUBSTR(year_date,7,2) AS day
+          FROM ${GHCNDatabase}.${GHCNTable}
+          WHERE id LIKE '${GHCNStation}'
+          AND element IN ('PRCP')
+          ORDER BY year_date, element;
+
+
+    TMIN:
+      Type: AWS::Athena::NamedQuery
+      Properties:
+        Database: !Ref GHCNDatabase
+        Description: "A query to create a table for temperature min"
+        Name: !Sub "${GHCNStation}_TMIN"
+        QueryString: !Sub >
+          CREATE TABLE ${GHCNDatabase}.${GHCNStation}_TMIN
+          WITH (
+            format='PARQUET'
+          ) AS 
+          SELECT 
+          id, 
+          element, 
+          CAST(data_value AS REAL)/10 AS t_min_value, 
+          year_date, 
+          SUBSTR(year_date,1,4) AS year, 
+          SUBSTR(year_date,5,2)||'-'|| SUBSTR(year_date,7,2) AS month_day,
+          SUBSTR(year_date,5,2) AS month,
+          SUBSTR(year_date,7,2) AS day
+          FROM ${GHCNDatabase}.${GHCNTable}
+          WHERE id LIKE '${GHCNStation}'
+          AND element IN ('TMIN')
+          ORDER BY year_date, element;
+
+    TMAX:
+      Type: AWS::Athena::NamedQuery
+      Properties:
+        Database: !Ref GHCNDatabase
+        Description: "A query to create a table for temperature max"
+        Name: !Sub "${GHCNStation}_TMAX"
+        QueryString: !Sub >
+          CREATE TABLE ${GHCNDatabase}.${GHCNStation}_TMAX
+          WITH (
+            format='PARQUET'
+          ) AS 
+          SELECT 
+          id, 
+          element, 
+          CAST(data_value AS REAL)/10 AS t_max_value, 
+          year_date, 
+          SUBSTR(year_date,1,4) AS year, 
+          SUBSTR(year_date,5,2)||'-'|| SUBSTR(year_date,7,2) AS month_day,
+          SUBSTR(year_date,5,2) AS month,
+          SUBSTR(year_date,7,2) AS day
+          FROM ${GHCNDatabase}.${GHCNTable}
+          WHERE id LIKE '${GHCNStation}'
+          AND element IN ('TMAX')
+          ORDER BY year_date, element;
+
+
+    GDD:
+      Type: AWS::Athena::NamedQuery
+      Properties:
+        Database: !Ref GHCNDatabase
+        Description: "A query that creates a table of growing degree days for wheat"
+        Name: !Sub "${GHCNStation}_GDD"
+        QueryString: !Sub >
+          CREATE TABLE ${GHCNDatabase}.${GHCNStation}_GDD
+          WITH (
+            format='PARQUET'
+          ) AS 
+          SELECT TMAX.id,
+          TMAX.year_date,
+          TMAX.year,
+          TMAX.month_day,
+          TMAX.month,
+          TMAX.day,
+          TMAX.t_max_value,
+          TMIN.t_min_value,
+          TMAX.t_max_value-TMIN.t_min_value/2 AS avg_temp,
+          IF((TMAX.t_max_value-TMIN.t_min_value/2>0) AND (TMIN.t_min_value>0), 1, 0) AS GDD
+          FROM ${GHCNDatabase}.${GHCNStation}_TMAX AS TMAX, 
+          ${GHCNDatabase}.${GHCNStation}_TMIN AS TMIN
+          WHERE TMAX.year_date = TMIN.year_date;
