@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This runs Sagemaker for a Jupyter Julia notebook to work with the NOAA GOES16 dataset.
+Resources:
+ 
+    ExecutionRole: 
+        Type: "AWS::IAM::Role"
+        Properties: 
+          AssumeRolePolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Principal: 
+                  Service: 
+                    - "sagemaker.amazonaws.com"
+                Action: 
+                  - "sts:AssumeRole"
+          Path: "/"
+
+    NotebookLifecycleConfig:
+        Type: AWS::SageMaker::NotebookInstanceLifecycleConfig
+        Properties:
+            OnCreate:
+            - Content:
+                Fn::Base64: |
+                  #!/bin/bash
+
+                  set -e
+                  sudo -u ec2-user -i <<'EOF'
+
+                  # Install some needed software
+                  sudo yum install -y golang git fuse-libs fuse-dev fuse
+
+                  # Install goofys
+                  nohup bash -c 'export GOPATH=/tmp/go/; go get github.com/kahing/goofys; go install github.com/kahing/goofys; sudo cp /tmp/go/bin/goofys /usr/local/bin/' &
+
+                  # Install version 1.4.2 of Julia in /opt
+                  cd /tmp
+                  curl -OL https://julialang-s3.julialang.org/bin/linux/x64/1.4/julia-1.4.2-linux-x86_64.tar.gz
+                  sudo tar xzvf julia-1.4.2-linux-x86_64.tar.gz -C /opt
+                  sudo ln -s /opt/julia-1.4.2/bin/julia /usr/local/bin/julia
+
+                  # Create mount points for noaa-goes16
+                  sudo mkdir -p /mnt/noaa-goes16
+                  sudo bash -c 'echo "goofys#noaa-goes16   /mnt/noaa-goes16        fuse     _netdev,allow_other,--file-mode=0555,--dir-mode=0555    0       0" >> /etc/fstab' &
+
+                  # Create a Conda environment 
+                  conda create --yes -n julia-1_4_2
+
+                  # Pkg installation can take a while
+                  nohup julia -e 'using Pkg; Pkg.add(["Plots", "NCDatasets", "IJulia", "Images"]); using Plots, NCDatasets, Images' &
+
+                  # wait to mount noaa-goes16 in case goofys hasn't finished installing
+                  nohup bash -c 'while [ ! -f /usr/local/bin/goofys ]; do sleep 10; done; sudo mount /mnt/noaa-goes16' &
+
+                  EOF
+
+
+    NotebookRepository:
+        Type: AWS::SageMaker::CodeRepository
+        Properties:
+            GitConfig:
+                RepositoryUrl: "https://github.com/awslabs/amazon-asdi"
+                Branch: "master"
+
+    NotebookInstance:
+        Type: "AWS::SageMaker::NotebookInstance"
+        Properties:
+            NotebookInstanceName: !Join
+            - ''
+            - - Julia-GOES16-
+              - !Select
+                - 6
+                - !Split
+                  - '-'
+                  - !Ref 'AWS::StackId'
+            InstanceType: "ml.c5.9xlarge"
+            DefaultCodeRepository: !GetAtt NotebookRepository.CodeRepositoryName
+            RoleArn: !GetAtt ExecutionRole.Arn
+            LifecycleConfigName:  !GetAtt NotebookLifecycleConfig.NotebookInstanceLifecycleConfigName
+
+Outputs:
+    JupyterNotebook:
+        Value: !Join
+        - ''
+        - - https://
+          - !Ref 'AWS::Region'
+          - .console.aws.amazon.com/sagemaker/home?region=
+          - !Ref 'AWS::Region'
+          - '#/notebook-instances/openNotebook/'
+          - !GetAtt 'NotebookInstance.NotebookInstanceName'
+          - '?view=lab'
