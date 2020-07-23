@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This runs Sagemaker for a Jupyter notebook to work with the OpenAQ dataset.
+Resources:
+
+    OpenAQDatabase:
+        Type: "AWS::Glue::Database"
+        Properties:
+            DatabaseInput:
+                Description: The OpenAQ Database
+                Name: "openaq"
+            CatalogId: !Ref AWS::AccountId
+    
+    OpenAQTable:
+        Type: "AWS::Glue::Table"
+        Properties:
+            TableInput: 
+                Name: openaq
+                PartitionKeys:
+                  - Name: year
+                    Type: int
+                  - Name: month
+                    Type: int
+                  - Name: day
+                    Type: int
+                TableType: EXTERNAL_TABLE
+                Parameters: { "projection.enabled": "true", "projection.year.type": "integer", "projection.year.range": "2013,2020", "projection.month.type": "integer", "projection.month.range": "01,12", "projection.month.digits": "2", "projection.day.type": "integer", "projection.day.range": "01,12", "projection.day.digits": "2", "storage.location.template": "s3://openaq-fetches/realtime-gzipped/${year}-${month}-${day}/" }
+                StorageDescriptor:
+                    InputFormat: org.apache.hadoop.mapred.TextInputFormat
+                    OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+                    StoredAsSubDirectories: False
+                    Location: s3://openaq-fetches/realtime-gzipped/
+                    SerdeInfo:
+                        SerializationLibrary: org.openx.data.jsonserde.JsonSerDe
+                    Columns:
+                    - Name: date
+                      Type: "struct<utc:string,local:string>"
+                    - Name: parameter
+                      Type: string
+                    - Name: location
+                      Type: string
+                    - Name: value
+                      Type: float
+                    - Name: unit
+                      Type: string
+                    - Name: city
+                      Type: string
+                    - Name: attribution
+                      Type: "array<struct<name:string,url:string>>"
+                    - Name: averagingperiod
+                      Type: "struct<unit:string,value:float>"
+                    - Name: coordinates
+                      Type: "struct<latitude:float,longitude:float>"
+                    - Name: country
+                      Type: string
+                    - Name: sourcename
+                      Type: string
+                    - Name: sourcetype
+                      Type: string
+                    - Name: mobile
+                      Type: string
+            DatabaseName: !Ref OpenAQDatabase
+            CatalogId: !Ref AWS::AccountId
