@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This runs Sagemaker for a Jupyter notebook to convert GFS data to Parquet format and then query it with Amazon Athena.
+Resources:
+ 
+    ExecutionRole: 
+        Type: "AWS::IAM::Role"
+        Properties: 
+          AssumeRolePolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Principal: 
+                  Service: 
+                    - "sagemaker.amazonaws.com"
+                Action: 
+                  - "sts:AssumeRole"
+          Path: "/"
+          ManagedPolicyArns: 
+            - "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess"
+            - "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
+            - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+
+    NotebookLifecycleConfig:
+        Type: AWS::SageMaker::NotebookInstanceLifecycleConfig
+        Properties:
+            OnCreate:
+            - Content:
+                Fn::Base64: |
+                    #!/bin/sh
+
+                    set -e
+                    sudo -u ec2-user -i <<'EOF'
+
+                    source activate python3
+                    nohup python3 -m pip install PyAthena cfgrib==0.9.8.1 pyeccodes >/home/ec2-user/pip.log &
+                    nohup conda update -n base -c defaults conda -y
+                    nohup conda install -c anaconda basemap proj4 pyarrow xarray -y 
+                    source deactivate
+
+                    EOF
+
+
+    NotebookRepository:
+        Type: AWS::SageMaker::CodeRepository
+        Properties:
+            GitConfig:
+                RepositoryUrl: "https://github.com/awslabs/amazon-asdi"
+                Branch: "master"
+
+    NotebookInstance:
+        Type: "AWS::SageMaker::NotebookInstance"
+        Properties:
+            NotebookInstanceName: !Join
+            - ''
+            - - GFS-
+              - !Select
+                - 6
+                - !Split
+                  - '-'
+                  - !Ref 'AWS::StackId'
+            InstanceType: "ml.c5.xlarge"
+            DefaultCodeRepository: !GetAtt NotebookRepository.CodeRepositoryName
+            RoleArn: !GetAtt ExecutionRole.Arn
+            LifecycleConfigName:  !GetAtt NotebookLifecycleConfig.NotebookInstanceLifecycleConfigName
+    
+Outputs:
+    JupyterNotebook:
+        Value: !Join
+        - ''
+        - - https://
+          - !Ref 'AWS::Region'
+          - .console.aws.amazon.com/sagemaker/home?region=
+          - !Ref 'AWS::Region'
+          - '#/notebook-instances/openNotebook/'
+          - !GetAtt 'NotebookInstance.NotebookInstanceName'
