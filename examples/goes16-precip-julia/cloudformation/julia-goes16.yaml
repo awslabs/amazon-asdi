@@ -34,18 +34,18 @@ Resources:
                   # Install goofys
                   nohup bash -c 'export GOPATH=/tmp/go/; go get github.com/kahing/goofys; go install github.com/kahing/goofys; sudo cp /tmp/go/bin/goofys /usr/local/bin/' &
 
-                  # Install version 1.4.2 of Julia in /opt
+                  # Install version 1.5.0 of Julia in /opt
                   cd /tmp
-                  curl -OL https://julialang-s3.julialang.org/bin/linux/x64/1.4/julia-1.4.2-linux-x86_64.tar.gz
-                  sudo tar xzvf julia-1.4.2-linux-x86_64.tar.gz -C /opt
-                  sudo ln -s /opt/julia-1.4.2/bin/julia /usr/local/bin/julia
+                  curl -OL https://julialang-s3.julialang.org/bin/linux/x64/1.5/julia-1.5.0-linux-x86_64.tar.gz
+                  sudo tar xzvf julia-1.5.0-linux-x86_64.tar.gz -C /opt
+                  sudo ln -s /opt/julia-1.5.0/bin/julia /usr/local/bin/julia
 
                   # Create mount points for noaa-goes16
                   sudo mkdir -p /mnt/noaa-goes16
                   sudo bash -c 'echo "goofys#noaa-goes16   /mnt/noaa-goes16        fuse     _netdev,allow_other,--file-mode=0555,--dir-mode=0555    0       0" >> /etc/fstab' &
 
                   # Create a Conda environment 
-                  conda create --yes -n julia-1_4_2
+                  conda create --yes -n julia-1_5_0
 
                   # Pkg installation can take a while
                   nohup julia -e 'using Pkg; Pkg.add(["Plots", "NCDatasets", "IJulia", "Images"]); using Plots, NCDatasets, Images' &
