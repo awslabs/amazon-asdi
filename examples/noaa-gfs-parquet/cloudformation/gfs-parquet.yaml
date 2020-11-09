@@ -27,18 +27,27 @@ Resources:
             OnCreate:
             - Content:
                 Fn::Base64: |
-                    #!/bin/sh
+                  #!/bin/sh
 
-                    set -e
-                    sudo -u ec2-user -i <<'EOF'
+                  set -e
+                  cat > /home/ec2-user/setup.sh << EOF
+                  #!/bin/bash
+                  sleep 10
+                  echo "Creating py3 conda environment"
+                  conda create --name py3 python="3.7.4" -y
+                  source activate py3
+                  conda install -c conda-forge basemap proj4 pyarrow -y 
+                  pip install ipykernel boto3 PyAthena cfgrib==0.9.8.1 pyeccodes dask==2.19.0 distributed==2.19.0 tornado==6.0.4 cloudpickle==1.4.1 msgpack==0.6.2 blosc==1.8.1 numpy==1.17.3 lz4==3.0.2 netcdf4==1.5.3 xarray==0.14.1 bokeh==2.1.1 s3fs==0.4.2 fsspec==0.7.4 h5netcdf==0.8.0 h5py==2.10.0
+                  python -m ipykernel install --user --name py3 --display-name "conda_py3"
+                  echo "Updating Jupyter config options"
+                  sed -i.bak 's/^#c.NotebookApp.iopub_data_rate_limit.*$/c.NotebookApp.iopub_data_rate_limit = 1.0e10/' ~/.jupyter/jupyter_notebook_config.py
+                  echo "Finished!"
+                  EOF
+              
+                  chown ec2-user:ec2-user /home/ec2-user/setup.sh
+                  chmod +x /home/ec2-user/setup.sh
 
-                    source activate python3
-                    nohup python3 -m pip install PyAthena cfgrib==0.9.8.1 pyeccodes >/home/ec2-user/pip.log &
-                    nohup conda update -n base -c defaults conda -y
-                    nohup conda install -c anaconda basemap proj4 pyarrow xarray -y 
-                    source deactivate
-
-                    EOF
+                  sudo -u ec2-user -i nohup /home/ec2-user/setup.sh >/home/ec2-user/output.log 2>&1 &
 
 
     NotebookRepository:
