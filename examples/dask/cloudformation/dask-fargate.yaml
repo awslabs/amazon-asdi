@@ -104,7 +104,7 @@ Resources:
           - sts:AssumeRole
       Path: "/"
       Policies:
-      - PolicyName: !Join [-, [!Ref 'AWS::StackName', 'CleanBucketOnDeleteLambdaPolicy'] ]
+      - PolicyName: !Join ['-', [!Ref 'AWS::StackName', 'CleanBucketOnDeleteLambdaPolicy'] ]
         PolicyDocument:
           Version: '2012-10-17'
           Statement:
@@ -222,7 +222,7 @@ Resources:
                   - aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
               build:
                 commands:
-                  - cd examples/dask-worker && docker build --tag $REPOSITORY_URI:$TAG .
+                  - cd examples/dask-worker && docker build --tag $REPOSITORY_URI:$TAG . && cd ../..
               post_build:
                 commands:
                   - docker push $REPOSITORY_URI:$TAG
@@ -514,7 +514,7 @@ Resources:
           - sts:AssumeRole
       Path: "/"
       Policies:
-      - PolicyName: !Join [ -, [!Ref 'AWS::StackName', 'CleanECROnDeleteLambdaPolicy'] ]
+      - PolicyName: !Join ['-', [!Ref 'AWS::StackName', 'CleanECROnDeleteLambdaPolicy'] ]
         PolicyDocument:
           Version: '2012-10-17'
           Statement:
@@ -901,7 +901,7 @@ Resources:
           - Arn
       DefaultCodeRepository: !Ref SagemakerCodeRepo
       DirectInternetAccess: Enabled
-      NotebookInstanceName: !Join [-, [!Ref 'AWS::StackName', 'DaskNotebook'] ]
+      NotebookInstanceName: !Join ['-', [!Ref 'AWS::StackName', 'DaskNotebook'] ]
       LifecycleConfigName:  !GetAtt NotebookLifecycleConfig.NotebookInstanceLifecycleConfigName
       RootAccess: Enabled
       SecurityGroupIds:
