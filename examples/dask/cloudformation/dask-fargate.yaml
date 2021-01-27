@@ -24,7 +24,7 @@ Parameters:
   DaskWorkerGitSourceBranch:
     Type: String
     Description: GitHub Repository Branch for Dask workers
-    Default: dask
+    Default: main
 
   CodeBuildDockerImage:
     Type: String

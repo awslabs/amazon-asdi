@@ -31,6 +31,10 @@ If you don't have a GitHub OAuth Token you can generate one. The AWS services re
 
 ![architecture](cloudformation/cloudformation_5.png)
 
+### Jupyter Notebook
+
+The Jupyter notebook environment will be set up with a kernel called `conda_daskpy3` which will contain the matching software for the dask-workers. 
+
 ### Architecture
 
 ![architecture](cloudformation/architecture.png)
