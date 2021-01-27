@@ -879,7 +879,7 @@ Resources:
                 conda create --name daskpy3 python="3.7.9" -y
                 source activate daskpy3
                 conda install -c conda basemap proj4 -y 
-                pip install zarr==2.3.2 rechunker==0.3.2 ipykernel boto3 dask==2.19.0 distributed==2.19.0 tornado==6.0.4 cloudpickle==1.4.1 msgpack==0.6.2 blosc==1.8.1 numpy==1.17.3 lz4==3.0.2 netcdf4==1.5.3 xarray==0.16.2 bokeh==2.1.1 s3fs==0.4.2 fsspec==0.7.4 h5netcdf==0.8.0 h5py==2.10.0 intake-stac==0.3.0 sat-search==0.3.0 rioxarray==0.1.1 geopandas==0.8.1
+                pip install zarr==2.3.2 rechunker==0.3.2 ipykernel boto3 dask==2.19.0 distributed==2.19.0 tornado==6.0.4 cloudpickle==1.4.1 msgpack==0.6.2 blosc==1.8.1 numpy==1.17.3 lz4==3.0.2 netcdf4==1.5.3 xarray==0.16.2 bokeh==2.1.1 s3fs==0.5.2 fsspec==0.8.5 h5netcdf==0.8.0 h5py==2.10.0 intake-stac==0.3.0 sat-search==0.3.0 rioxarray==0.1.1 geopandas==0.8.1
                 python -m ipykernel install --user --name daskpy3 --display-name "conda_daskpy3"
                 echo "Updating Jupyter config options"
                 sed -i.bak 's/^#c.NotebookApp.iopub_data_rate_limit.*$/c.NotebookApp.iopub_data_rate_limit = 1.0e10/' ~/.jupyter/jupyter_notebook_config.py
