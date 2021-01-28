@@ -7,10 +7,10 @@ RUN conda install --yes \
     -c conda-forge \
     python==3.7.9 \
     python-blosc==1.8.1 \
-    cytoolz \
-    dask==2.19.0 \
+    cytoolz==0.11.0 \
+    dask==2021.1.1 \
     lz4==3.0.2 \
-    nomkl \
+    nomkl==1.0 \
     msgpack-python==0.6.2 \
     netcdf4==1.5.3 \
     numpy==1.17.3 \
@@ -20,10 +20,10 @@ RUN conda install --yes \
     s3fs==0.5.2 \
     fsspec==0.8.5 \
     h5netcdf==0.8.0 \
-    distributed==2.19.0 \
-    tornado==6.0.4 \ 
-    cloudpickle==1.4.1 \
-    h5py==2.10.0 \
+    distributed==2021.1.1 \
+    tornado==6.1 \ 
+    cloudpickle==1.6.0 \
+    h5py==3.1.0 \
     zarr==2.3.2 \
     rechunker==0.3.2 \
     && conda clean -tipsy \
