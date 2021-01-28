@@ -1,14 +1,15 @@
-logging:
-  distributed: info
-  bokeh: critical
-  tornado: critical
+distributed:
+  logging:
+    distributed: info
+    bokeh: critical
+    tornado: critical
 
-scheduler:
-  work-stealing: True
-  allowed-failures: 10
+  scheduler:
+    work-stealing: True
+    allowed-failures: 10
 
-admin:
-  log-format: '%(name)s - %(levelname)s - %(message)s'
-  tick:
-    interval: 20ms  
-    limit: 1h
+  admin:
+    log-format: '%(name)s - %(levelname)s - %(message)s'
+    tick:
+      interval: 20ms  
+      limit: 1h
