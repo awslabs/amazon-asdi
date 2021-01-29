@@ -23,7 +23,7 @@ RUN conda install --yes \
     distributed==2021.1.1 \
     tornado==6.1 \ 
     cloudpickle==1.6.0 \
-    h5py==2.10.0 \
+    h5py==3.1.0 \
     zarr==2.3.2 \
     rechunker==0.3.2 \
     && conda clean -tipsy \
