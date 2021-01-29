@@ -15,7 +15,7 @@ RUN conda install --yes \
     netcdf4==1.5.5.1 \
     numpy==1.19.5 \
     pandas==1.2.1 \
-    xarray==0.16.2 \
+    xarray==0.14.1 \
     bokeh==2.2.3 \
     s3fs==0.5.2 \
     fsspec==0.8.5 \
@@ -24,14 +24,15 @@ RUN conda install --yes \
     tornado==6.1 \ 
     cloudpickle==1.6.0 \
     h5py==3.1.0 \
-    zarr==2.3.2 \
-    rechunker==0.3.2 \
     && conda clean -tipsy \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
     && find /opt/conda/ -type f,l -name '*.pyc' -delete \
     && find /opt/conda/ -type f,l -name '*.js.map' -delete \
     && find /opt/conda/lib/python*/site-packages/bokeh/server/static -type f,l -name '*.js' -not -name '*.min.js' -delete \
     && rm -rf /opt/conda/pkgs
+
+#    zarr==2.3.2 \
+ #   rechunker==0.3.2 \
 
 COPY prepare.sh /usr/bin/prepare.sh
 RUN chmod +x /usr/bin/prepare.sh
