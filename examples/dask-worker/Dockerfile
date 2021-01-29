@@ -6,20 +6,20 @@ RUN chmod +x /usr/local/bin/dumb-init
 RUN conda install --yes \
     -c conda-forge \
     python==3.7.9 \
-    python-blosc==1.8.1 \
+    python-blosc==1.10.2 \
     cytoolz==0.11.0 \
     dask==2021.1.1 \
-    lz4==3.0.2 \
+    lz4==3.1.3 \
     nomkl==1.0 \
     msgpack-python==0.6.2 \
-    netcdf4==1.5.3 \
-    numpy==1.17.3 \
-    pandas==1.0.5 \
+    netcdf4==1.5.5.1 \
+    numpy==1.19.5 \
+    pandas==1.2.1 \
     xarray==0.16.2 \
-    bokeh==2.1.1 \
+    bokeh==2.2.3 \
     s3fs==0.5.2 \
     fsspec==0.8.5 \
-    h5netcdf==0.8.0 \
+    h5netcdf==0.8.1 \
     distributed==2021.1.1 \
     tornado==6.1 \ 
     cloudpickle==1.6.0 \
