@@ -11,7 +11,7 @@ RUN conda install --yes \
     dask==2021.1.1 \
     lz4==3.1.3 \
     nomkl==1.0 \
-    msgpack-python==0.6.2 \
+    msgpack-python==1.0.2 \
     netcdf4==1.5.5.1 \
     numpy==1.19.5 \
     pandas==1.2.1 \
