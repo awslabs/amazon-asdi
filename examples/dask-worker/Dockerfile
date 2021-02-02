@@ -25,7 +25,6 @@ RUN conda install --yes \
     h5py==3.1.0 \
     zarr==2.3.2 \
     rechunker==0.3.2 \
-    && conda clean -tipsy \
     && pip uninstall -y cytoolz \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
     && find /opt/conda/ -type f,l -name '*.pyc' -delete \
