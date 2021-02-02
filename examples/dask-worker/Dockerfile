@@ -7,7 +7,6 @@ RUN conda install --yes \
     -c conda-forge \
     python==3.7.9 \
     python-blosc==1.10.2 \
-    cytoolz==0.11.0 \
     dask==2021.1.1 \
     lz4==3.1.3 \
     nomkl==1.0 \
