@@ -16,8 +16,8 @@ RUN conda install --yes \
     pandas==1.2.1 \
     xarray==0.16.2 \
     bokeh==2.2.3 \
-    s3fs==0.5.2 \
-    fsspec==0.8.5 \
+    s3fs==0.4.2 \
+    fsspec==0.7.4 \
     h5netcdf==0.8.1 \
     distributed==2021.1.1 \
     tornado==6.1 \ 
