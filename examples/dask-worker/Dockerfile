@@ -26,6 +26,7 @@ RUN conda install --yes \
     zarr==2.3.2 \
     rechunker==0.3.2 \
     && pip uninstall -y cytoolz \
+    && pip install git+git://github.com/pydata/xarray.git@070d8158aab31c6a53efb36f9ea4a57dc6671e43 \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
     && find /opt/conda/ -type f,l -name '*.pyc' -delete \
     && find /opt/conda/ -type f,l -name '*.js.map' -delete \
