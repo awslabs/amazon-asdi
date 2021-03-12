@@ -26,7 +26,7 @@ RUN conda install --yes \
     zarr==2.3.2 \
     rechunker==0.3.2 \
     && pip uninstall -y cytoolz \
-    && pip install git+https://github.com/martindurant/filesystem_spec@ioloop_massage \
+    && pip install git+https://github.com/martindurant/filesystem_spec@ioloop_massage2 \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
     && find /opt/conda/ -type f,l -name '*.pyc' -delete \
     && find /opt/conda/ -type f,l -name '*.js.map' -delete \
