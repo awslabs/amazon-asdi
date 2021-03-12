@@ -16,8 +16,8 @@ RUN conda install --yes \
     pandas==1.2.1 \
     xarray==0.16.2 \
     bokeh==2.2.3 \
-    s3fs==0.4.2 \
-    fsspec==0.7.4 \
+    s3fs==0.5.2 \
+    fsspec==0.8.7 \
     h5netcdf==0.8.1 \
     distributed==2021.1.1 \
     tornado==6.1 \ 
@@ -26,7 +26,7 @@ RUN conda install --yes \
     zarr==2.3.2 \
     rechunker==0.3.2 \
     && pip uninstall -y cytoolz \
-    && pip install git+git://github.com/pydata/xarray.git@070d8158aab31c6a53efb36f9ea4a57dc6671e43 \
+    && pip install git+https://github.com/martindurant/filesystem_spec@ioloop_massage \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
     && find /opt/conda/ -type f,l -name '*.pyc' -delete \
     && find /opt/conda/ -type f,l -name '*.js.map' -delete \
