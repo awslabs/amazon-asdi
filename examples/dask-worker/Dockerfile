@@ -14,7 +14,7 @@ RUN conda install --yes \
     netcdf4==1.5.5.1 \
     numpy==1.19.5 \
     pandas==1.2.1 \
-    xarray==0.16.2 \
+    xarray==0.17.0 \
     bokeh==2.2.3 \
     s3fs==0.5.2 \
     fsspec==0.8.7 \
@@ -25,8 +25,6 @@ RUN conda install --yes \
     h5py==3.1.0 \
     zarr==2.3.2 \
     rechunker==0.3.2 \
-    && pip uninstall -y cytoolz \
-    && pip install git+https://github.com/martindurant/filesystem_spec@ioloop_massage2 \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
     && find /opt/conda/ -type f,l -name '*.pyc' -delete \
     && find /opt/conda/ -type f,l -name '*.js.map' -delete \
