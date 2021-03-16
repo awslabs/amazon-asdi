@@ -6,7 +6,7 @@ distributed:
     tornado: critical
 
   scheduler:
-    work-stealing: True
+    work-stealing: False
     allowed-failures: 10
 
   admin:

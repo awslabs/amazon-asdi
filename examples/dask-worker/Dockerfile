@@ -7,18 +7,17 @@ RUN conda install --yes \
     -c conda-forge \
     python==3.7.9 \
     python-blosc==1.10.2 \
-    cytoolz==0.11.0 \
     dask==2021.1.1 \
     lz4==3.1.3 \
     nomkl==1.0 \
-    msgpack-python==0.6.2 \
+    msgpack-python==1.0.2 \
     netcdf4==1.5.5.1 \
     numpy==1.19.5 \
     pandas==1.2.1 \
-    xarray==0.16.2 \
+    xarray==0.17.0 \
     bokeh==2.2.3 \
-    s3fs==0.5.2 \
-    fsspec==0.8.5 \
+    s3fs==0.4.2 \
+    fsspec==0.7.4 \
     h5netcdf==0.8.1 \
     distributed==2021.1.1 \
     tornado==6.1 \ 
@@ -26,7 +25,6 @@ RUN conda install --yes \
     h5py==3.1.0 \
     zarr==2.3.2 \
     rechunker==0.3.2 \
-    && conda clean -tipsy \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
     && find /opt/conda/ -type f,l -name '*.pyc' -delete \
     && find /opt/conda/ -type f,l -name '*.js.map' -delete \
