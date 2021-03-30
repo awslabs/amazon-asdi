@@ -21,9 +21,9 @@ For other models and datasets including NEXRAD, NDFD, and NAM check out their re
 
 Datasets made available on AWS often have associated [Amazon Simple Notification Service (SNS)](https://aws.amazon.com/sns/) topics available for receiving new object notifications. These are push notifications for when a new file (i.e. new GFS forecast hour) is available on S3\. You can use these notifications to kick off automated processing pipelines for working with the data instead of polling for data availability. 
 
-There is an example of converting GOES-16 & GOES-17 ABI images to cloud optimized geotiffs with Lambda upon new object notification at 
+For example, [here is a demonstration on how to convert GOES-16 & GOES-17 ABI images](https://github.com/zflamig/goes-to-cog) to cloud optimized geotiffs with Lambda upon new object notification. 
 
-Here is an example of how to receive the new object notification into the [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/) where it can be used for further processing. 
+You can also route the new object notifications into a [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/) where they can be used for further processing. 
 
 ## Global Forecast System (GFS)
 
