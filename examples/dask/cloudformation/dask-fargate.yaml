@@ -3,7 +3,7 @@ Parameters:
     Type: String
     Description: GitHub OAuth Token for accessing the Dask worker repository
     MinLength: 40
-    AllowedPattern: "[a-zA-Z0-9]+"
+    AllowedPattern: "[a-zA-Z0-9\-\_]+"
     NoEcho: true
 
   SagemakerCodeRepo:
