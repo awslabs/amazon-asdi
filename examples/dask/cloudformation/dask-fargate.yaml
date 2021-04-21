@@ -668,6 +668,9 @@ Resources:
       ContainerDefinitions:
         - Command:
             - dask-scheduler
+            - --dashboard
+            - --dashboard-address
+            - '8787'
           Cpu: 4096
           Essential: true
           Image: daskdev/dask:2.9.2
