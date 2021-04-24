@@ -61,7 +61,7 @@ Resources:
         Properties:
             GitConfig:
                 RepositoryUrl: "https://github.com/awslabs/amazon-asdi"
-                Branch: "master"
+                Branch: "main"
 
     NotebookInstance:
         Type: "AWS::SageMaker::NotebookInstance"

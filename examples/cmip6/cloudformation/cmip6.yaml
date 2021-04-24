@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This runs Sagemaker for a Jupyter notebook to work with the NOAA ISD open dataset.
+Resources:
+ 
+    ExecutionRole: 
+        Type: "AWS::IAM::Role"
+        Properties: 
+          AssumeRolePolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Principal: 
+                  Service: 
+                    - "sagemaker.amazonaws.com"
+                Action: 
+                  - "sts:AssumeRole"
+          Path: "/"
+          ManagedPolicyArns: 
+            - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+
+    NotebookLifecycleConfig:
+        Type: AWS::SageMaker::NotebookInstanceLifecycleConfig
+        Properties:
+          OnCreate:
+          - Content:
+              Fn::Base64: |
+                #!/bin/sh
+
+                set -e
+                cat > /home/ec2-user/setup.sh << EOF
+                #!/bin/bash
+                sleep 10
+                echo "Creating daskpy3 conda environment"
+                conda create --name daskpy3 python="3.7.9" -y
+                source activate daskpy3
+                conda install -c conda basemap proj4 nodejs ipywidgets -y 
+                pip install zarr==2.7.1 rechunker==0.3.2 ipykernel boto3 dask==2021.1.1 distributed==2021.1.1 tornado==6.1 cloudpickle==1.6.0 msgpack==1.0.2 blosc==1.10.2 numpy==1.19.5 pandas==1.2.1 lz4==3.1.3 netcdf4==1.5.5.1 xarray==0.17.0 bokeh==2.2.3 s3fs==0.4.2 fsspec==2021.4.0 h5netcdf==0.8.1 h5py==3.1.0 intake==0.6.2 intake-esm==2021.1.15
+                python -m ipykernel install --user --name daskpy3 --display-name "conda_daskpy3"
+                echo "Updating Jupyter config options"
+                sed -i.bak 's/^#c.NotebookApp.iopub_data_rate_limit.*$/c.NotebookApp.iopub_data_rate_limit = 1.0e10/' ~/.jupyter/jupyter_notebook_config.py
+                sed -i.bak 's/^#c.NotebookApp.iopub_msg_rate_limit.*$/c.NotebookApp.iopub_msg_rate_limit = 1.0e10/' ~/.jupyter/jupyter_notebook_config.py
+                source /home/ec2-user/anaconda3/bin/deactivate
+                source activate JupyterSystemEnv
+                jupyter labextension install @jupyter-widgets/jupyterlab-manager@1.1
+                source /home/ec2-user/anaconda3/bin/deactivate
+                echo "Finished!"
+                EOF
+            
+                chown ec2-user:ec2-user /home/ec2-user/setup.sh
+                chmod +x /home/ec2-user/setup.sh
+
+                sudo -u ec2-user -i nohup /home/ec2-user/setup.sh >/home/ec2-user/output.log 2>&1 &
+
+
+    NotebookRepository:
+        Type: AWS::SageMaker::CodeRepository
+        Properties:
+            GitConfig:
+                RepositoryUrl: "https://github.com/awslabs/amazon-asdi"
+                Branch: "main"
+
+    NotebookInstance:
+        Type: "AWS::SageMaker::NotebookInstance"
+        Properties:
+            NotebookInstanceName: !Join
+            - ''
+            - - CMIP6-
+              - !Select
+                - 6
+                - !Split
+                  - '-'
+                  - !Ref 'AWS::StackId'
+            InstanceType: "ml.c5.xlarge"
+            DefaultCodeRepository: !GetAtt NotebookRepository.CodeRepositoryName
+            RoleArn: !GetAtt ExecutionRole.Arn
+            LifecycleConfigName:  !GetAtt NotebookLifecycleConfig.NotebookInstanceLifecycleConfigName
+    
+Outputs:
+    JupyterNotebook:
+        Value: !Join
+        - ''
+        - - https://
+          - !Ref 'AWS::Region'
+          - .console.aws.amazon.com/sagemaker/home?region=
+          - !Ref 'AWS::Region'
+          - '#/notebook-instances/openNotebook/'
+          - !GetAtt 'NotebookInstance.NotebookInstanceName'
+          - '?view=lab'
