@@ -23,7 +23,7 @@ Resources:
                   - Name: day
                     Type: int
                 TableType: EXTERNAL_TABLE
-                Parameters: { "projection.enabled": "true", "projection.year.type": "integer", "projection.year.range": "2013,2020", "projection.month.type": "integer", "projection.month.range": "01,12", "projection.month.digits": "2", "projection.day.type": "integer", "projection.day.range": "01,12", "projection.day.digits": "2", "storage.location.template": "s3://openaq-fetches/realtime-gzipped/${year}-${month}-${day}/" }
+                Parameters: { "projection.enabled": "true", "projection.year.type": "integer", "projection.year.range": "2013,2024", "projection.month.type": "integer", "projection.month.range": "01,12", "projection.month.digits": "2", "projection.day.type": "integer", "projection.day.range": "01,31", "projection.day.digits": "2", "storage.location.template": "s3://openaq-fetches/realtime-gzipped/${year}-${month}-${day}/" }
                 StorageDescriptor:
                     InputFormat: org.apache.hadoop.mapred.TextInputFormat
                     OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat

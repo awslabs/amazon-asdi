@@ -46,7 +46,7 @@ Resources:
         Properties:
             GitConfig:
                 RepositoryUrl: "https://github.com/awslabs/amazon-asdi"
-                Branch: "master"
+                Branch: "main"
 
     NotebookInstance:
         Type: "AWS::SageMaker::NotebookInstance"
@@ -81,7 +81,7 @@ Resources:
                   - Name: year
                     Type: int
                 TableType: EXTERNAL_TABLE
-                Parameters: { "projection.enabled": "true", "projection.year.type": "integer", "projection.year.range": "1901,2020", "storage.location.template": "s3://noaa-isd-pds/data/${year}/" }
+                Parameters: { "projection.enabled": "true", "projection.year.type": "integer", "projection.year.range": "1901,2024", "storage.location.template": "s3://noaa-isd-pds/data/${year}/" }
                 StorageDescriptor:
                     InputFormat: org.apache.hadoop.mapred.TextInputFormat
                     OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
