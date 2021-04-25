@@ -6,7 +6,7 @@ Parameters:
 
   DaskImage:
     Type: String
-    Default: daskdev/dask:2.19.0
+    Default: daskdev/dask:latest
     Description: Container image to use for the Dask workers before our custom image is built
 
   DaskWorkerCPU:
@@ -41,6 +41,9 @@ Resources:
           - 0
           - Fn::GetAZs: ""
       MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: dask-fargate/PublicSubnet1
   PublicSubnet1RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -86,6 +89,54 @@ Resources:
         Ref: DaskVpc
       InternetGatewayId:
         Ref: InternetGateway
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt PublicSubnet1EIP.AllocationId
+      SubnetId: !Ref PublicSubnet1
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.10.64.0/18
+      VpcId:
+        Ref: DaskVpc
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      Tags:
+        - Key: Name
+          Value: dask-fargate/PrivateSubnet1
+  PrivateSubnet1RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: DaskVpc
+      Tags:
+        - Key: Name
+          Value: dask-fargate/MyVpc/PrivateSubnet1
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: PrivateSubnet1RouteTable
+      SubnetId:
+        Ref: PrivateSubnet1
+  PrivateSubnet1DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PrivateSubnet1RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NATGateway
+  PrivateSubnetS3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      RouteTableIds:
+        - !Ref PrivateSubnet1RouteTable
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      VpcId: !Ref DaskVpc
 
   LogGroupScheduler:
     Type: AWS::Logs::LogGroup
@@ -178,7 +229,7 @@ Resources:
                 Ref: AWS::Region
           Memory: 30720
           MemoryReservation: 30720
-          Name: Worker
+          Name: Scheduler
       Cpu: "4096"
       ExecutionRoleArn:
         Fn::GetAtt:
@@ -242,28 +293,72 @@ Resources:
           - ECSExecutionRole
           - Arn
 
-  DaskSecurityGroup:
+  DaskSchedulerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable Scheduler ports access
-      GroupName: DaskSecurityGroup
+      GroupName: DaskSchedulerSecurityGroup
       SecurityGroupEgress:
         - CidrIp: 0.0.0.0/0
           Description: Allow all outbound traffic by default
           IpProtocol: "-1"
       SecurityGroupIngress:
         - CidrIp: 0.0.0.0/0
-          Description: from 0.0.0.0/0:p1
+          Description: Allow access to the dask dashboard
+          FromPort: 8787
+          IpProtocol: tcp
+          ToPort: 8787
+        - SourceSecurityGroupId: !GetAtt NotebookSecurityGroup.GroupId
+          Description: Allow access from SageMaker notebook
           FromPort: 8786
           IpProtocol: tcp
           ToPort: 8789
+      VpcId: !Ref DaskVpc
+
+  NotebookSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow access to SageMaker notebook instance
+      GroupName: NotebookSecurityGroup
+      SecurityGroupEgress:
         - CidrIp: 0.0.0.0/0
-          Description: from 0.0.0.0/0:p2
-          FromPort: 9000
-          IpProtocol: tcp
-          ToPort: 9002
-      VpcId:
-        Ref: DaskVpc
+          Description: Allow all outbound traffic by default
+          IpProtocol: '-1'
+      VpcId: !Ref DaskVpc
+
+  DaskWorkerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Restrict connectivity to dask workers
+      GroupName: DaskWorkerSecurityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: '-1'
+      SecurityGroupIngress:
+        - SourceSecurityGroupId: !GetAtt DaskSchedulerSecurityGroup.GroupId
+          Description: Allow full access from dask scheduler
+          IpProtocol: '-1'
+        - SourceSecurityGroupId: !GetAtt NotebookSecurityGroup.GroupId
+          Description: Allow full access from the notebook
+          IpProtocol: '-1'
+      VpcId: !Ref DaskVpc
+
+  DaskWorkerToWorkerIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow dask workers to communicate freely with each other
+      GroupId: !GetAtt DaskWorkerSecurityGroup.GroupId
+      SourceSecurityGroupId: !GetAtt DaskWorkerSecurityGroup.GroupId
+      IpProtocol: '-1'
+
+  DaskWorkerToSchedulerIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow dask workers to communicate with the scheduler
+      GroupId: !GetAtt DaskSchedulerSecurityGroup.GroupId
+      SourceSecurityGroupId: !GetAtt DaskWorkerSecurityGroup.GroupId
+      IpProtocol: '-1'
 
   DaskSchedulerService:
     Type: AWS::ECS::Service
@@ -281,7 +376,7 @@ Resources:
           AssignPublicIp: ENABLED
           SecurityGroups:
             - Fn::GetAtt:
-                - DaskSecurityGroup
+                - DaskSchedulerSecurityGroup
                 - GroupId
           Subnets:
             - Ref: PublicSubnet1
@@ -327,13 +422,12 @@ Resources:
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
           SecurityGroups:
             - Fn::GetAtt:
-                - DaskSecurityGroup
+                - DaskWorkerSecurityGroup
                 - GroupId
           Subnets:
-            - Ref: PublicSubnet1
+            - Ref: PrivateSubnet1
       ServiceName: Dask-Worker
       TaskDefinition:
         Ref: WorkerDefinition
@@ -408,12 +502,11 @@ Resources:
           - Arn
       DefaultCodeRepository: !Ref SagemakerCodeRepo
       DirectInternetAccess: Enabled
-      NotebookInstanceName: !Join ['-', [!Ref 'AWS::StackName', 'DaskNotebook'] ]
       LifecycleConfigName:  !GetAtt NotebookLifecycleConfig.NotebookInstanceLifecycleConfigName
       RootAccess: Enabled
       SecurityGroupIds:
         - Fn::GetAtt:
-            - DaskSecurityGroup
+            - NotebookSecurityGroup
             - GroupId
       SubnetId:
         Ref: PublicSubnet1
