@@ -27,13 +27,9 @@ Parameters:
     Type: String
     Default: aws/codebuild/standard:5.0
 
-  InitialImage:
-    Type: String
-    Default: daskdev/dask:2.9.2
-    Description: Initial image to use for the Dask workers before our custom image is built
-
   DaskClusterName:
     Type: String
+    Default: 'None'
     Description: Name of the ECS cluster to deploy into
 
   DaskWorkerServiceName:
@@ -45,6 +41,10 @@ Parameters:
     Type: String
     Default: Dask-Scheduler
     Description: Name of the dask scheduler ECS service
+
+Conditions:
+  BuildOnlyPipeline: !Equals [!Ref DaskClusterName, 'None']
+  DeployToECSPipeline: !Not [!Condition BuildOnlyPipeline]
 
 Resources:
   CodePipelineArtifactBucket:
@@ -233,14 +233,15 @@ Resources:
                   - aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
               build:
                 commands:
-                  - cd examples/dask-worker && docker build --tag $REPOSITORY_URI:$TAG . && cd ../..
+                  - cd examples/dask-worker && docker build --tag $REPOSITORY_URI:$TAG --tag $REPOSITORY_URI:latest . && cd ../..
               post_build:
                 commands:
                   - docker push $REPOSITORY_URI:$TAG
+                  - docker push $REPOSITORY_URI:latest
                   - printf '[{"name":"${ServiceName}","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
             artifacts:
               files: build.json
-          - ServiceName: Worker
+          - ServiceName: Dask
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
@@ -298,11 +299,14 @@ Resources:
                   - s3:GetObject
                   - s3:GetObjectVersion
                   - s3:GetBucketVersioning
-              - Resource: !Sub ${NotifyWaitConditionLambdaFunction.Arn}
-                Effect: Allow
-                Action:
-                  - lambda:InvokeFunction
-                  - lambda:InvokeAsync
+              - Fn::If:
+                  - DeployToECSPipeline
+                  - Resource: !Sub ${NotifyWaitConditionLambdaFunction.Arn}
+                    Effect: Allow
+                    Action:
+                      - lambda:InvokeFunction
+                      - lambda:InvokeAsync
+                  - !Ref "AWS::NoValue"
     DependsOn:
       - CodePipelineArtifactBucket
 
@@ -347,43 +351,46 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
               RunOrder: 1
-        - Name: Deploy
-          Actions:
-            - Name: DeployScheduler
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Version: 1
-                Provider: ECS
-              Configuration:
-                ClusterName: !Ref DaskClusterName
-                ServiceName: !Ref DaskSchedulerServiceName
-                FileName: build.json
-              InputArtifacts:
-                - Name: BuildOutput
-              RunOrder: 1
-            - Name: DeployWorker
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Version: 1
-                Provider: ECS
-              Configuration:
-                ClusterName: !Ref DaskClusterName
-                ServiceName: !Ref DaskWorkerServiceName
-                FileName: build.json
-              InputArtifacts:
-                - Name: BuildOutput
-              RunOrder: 2
-            - Name: NotifyCloudformation
-              ActionTypeId:
-                Category: Invoke
-                Owner: AWS
-                Version: "1"
-                Provider: Lambda
-              Configuration:
-                FunctionName: !Ref NotifyWaitConditionLambdaFunction
-              RunOrder: 3
+        - Fn::If:
+            - DeployToECSPipeline
+            - Name: Deploy
+              Actions:
+                - Name: DeployScheduler
+                  ActionTypeId:
+                    Category: Deploy
+                    Owner: AWS
+                    Version: 1
+                    Provider: ECS
+                  Configuration:
+                    ClusterName: !Ref DaskClusterName
+                    ServiceName: !Ref DaskSchedulerServiceName
+                    FileName: build.json
+                  InputArtifacts:
+                    - Name: BuildOutput
+                  RunOrder: 1
+                - Name: DeployWorker
+                  ActionTypeId:
+                    Category: Deploy
+                    Owner: AWS
+                    Version: 1
+                    Provider: ECS
+                  Configuration:
+                    ClusterName: !Ref DaskClusterName
+                    ServiceName: !Ref DaskWorkerServiceName
+                    FileName: build.json
+                  InputArtifacts:
+                    - Name: BuildOutput
+                  RunOrder: 2
+                - Name: NotifyCloudformation
+                  ActionTypeId:
+                    Category: Invoke
+                    Owner: AWS
+                    Version: "1"
+                    Provider: Lambda
+                  Configuration:
+                    FunctionName: !Ref NotifyWaitConditionLambdaFunction
+                  RunOrder: 3
+            - !Ref "AWS::NoValue"
           
     DependsOn:
       - CodePipelineArtifactBucket
@@ -392,9 +399,11 @@ Resources:
 
   DeployWaitHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
+    Condition: DeployToECSPipeline
 
   DeployWaitCondition:
     Type: AWS::CloudFormation::WaitCondition
+    Condition: DeployToECSPipeline
     Properties:
       Count: 1
       Handle: !Ref DeployWaitHandle
@@ -402,6 +411,7 @@ Resources:
   
   NotifyWaitConditionLambdaFunction:
     Type: AWS::Lambda::Function
+    Condition: DeployToECSPipeline
     Properties:
       Handler: index.handler
       Role: !GetAtt LambdaNotifyRole.Arn
@@ -428,6 +438,7 @@ Resources:
   
   LambdaNotifyRole:
     Type: AWS::IAM::Role
+    Condition: DeployToECSPipeline
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17

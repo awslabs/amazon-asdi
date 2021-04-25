@@ -229,7 +229,7 @@ Resources:
                 Ref: AWS::Region
           Memory: 30720
           MemoryReservation: 30720
-          Name: Scheduler
+          Name: Dask
       Cpu: "4096"
       ExecutionRoleArn:
         Fn::GetAtt:
@@ -277,7 +277,7 @@ Resources:
                 Ref: AWS::Region
           Memory: !Ref DaskWorkerMemory
           MemoryReservation: !Ref DaskWorkerMemory
-          Name: Worker
+          Name: Dask
       Cpu: !Ref DaskWorkerCPU
       ExecutionRoleArn:
         Fn::GetAtt:
