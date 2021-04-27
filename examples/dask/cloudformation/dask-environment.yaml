@@ -19,6 +19,17 @@ Parameters:
     Default: '8192'
     Description: Memory in GB for dask workers
 
+  DaskWorkerSpotPricing:
+    Type: String
+    Default: 'NO'
+    Description: Use Fargate spot pricing for dask workers, to save money (workers may be terminated)
+    AllowedValues:
+      - 'YES'
+      - 'NO'
+
+Conditions:
+  DaskWorkerSpotPricingCondition: !Equals [!Ref DaskWorkerSpotPricing, 'YES']
+
 Resources:
   DaskVpc:
     Type: AWS::EC2::VPC
@@ -199,6 +210,14 @@ Resources:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: !Join ["-", [!Ref "AWS::StackName", "Fargate-Dask-Cluster"]]
+      CapacityProviders:
+        - FARGATE
+        - FARGATE_SPOT
+      DefaultCapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Weight: 1
+        - CapacityProvider: FARGATE_SPOT
+          Weight: 0
 
   DaskClusterPrivateNS:
     Type: AWS::ServiceDiscovery::PrivateDnsNamespace
@@ -412,6 +431,13 @@ Resources:
   DaskWorkerService:
     Type: AWS::ECS::Service
     Properties:
+      CapacityProviderStrategy:
+        - CapacityProvider:
+            Fn::If:
+              - DaskWorkerSpotPricingCondition
+              - FARGATE_SPOT
+              - FARGATE
+          Weight: 1
       Cluster:
         Ref: DaskCluster
       DeploymentConfiguration:
