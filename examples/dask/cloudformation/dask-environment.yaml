@@ -445,7 +445,6 @@ Resources:
         MinimumHealthyPercent: 100
       DesiredCount: 0
       EnableECSManagedTags: false
-      LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
           SecurityGroups:
@@ -549,3 +548,5 @@ Outputs:
         - '#/notebook-instances/openNotebook/'
         - !GetAtt 'DaskNotebook.NotebookInstanceName'
         - '?view=lab'
+  DaskECSClusterName:
+    Value: !Ref DaskCluster
