@@ -52,6 +52,14 @@ Parameters:
     Default: 'NO'
     Description: Use local template files instead of S3 URLs (when using aws cloudformation package / deploy)?
 
+  UseSpotPricing:
+    Type: String
+    AllowedValues:
+      - 'YES'
+      - 'NO'
+    Default: 'NO'
+    Description: Use Fargate spot pricing for dask workers to reduce cost?
+
 Conditions:
   LocalTemplates: !Equals [!Ref UseLocalTemplates, 'YES']
   S3Templates: !Not [!Condition LocalTemplates]
@@ -81,6 +89,7 @@ Resources:
       Parameters:
         SagemakerCodeRepo: !Ref SagemakerCodeRepo
         DaskImage: !Sub '${DaskPipelineStack.Outputs.ECRRepositoryName}:latest'
+        DaskWorkerSpotPricing: !Ref UseSpotPricing
 
   # Below are used when deploying from a local copy of the templates, via the AWS CLI
   # with 'aws cloudformation package' and 'aws cloudformation deploy'
@@ -105,6 +114,7 @@ Resources:
       Parameters:
         SagemakerCodeRepo: !Ref SagemakerCodeRepo
         DaskImage: !Sub '${DaskPipelineStackFromLocal.Outputs.ECRRepositoryName}:latest'
+        DaskWorkerSpotPricing: !Ref UseSpotPricing
   
 Outputs:
   JupyterNotebook:
