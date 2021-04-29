@@ -1,3 +1,7 @@
+# This template provides a quick start distributed environment for dask on AWS.
+# It will:
+# 1) Create a pipeline to build a container image for dask and other necessary software
+# 2) Create a new dask environment with VPC, ECS cluster and SageMaker notebook
 Parameters:
   DaskWorkerGitToken:
     Type: String
@@ -30,11 +34,6 @@ Parameters:
     Type: String
     Default: aws/codebuild/standard:5.0
 
-  InitialImage:
-    Type: String
-    Default: daskdev/dask:latest
-    Description: Initial image to use for the Dask workers before our custom image is built
-
   EnvironmentTemplateLocation:
     Type: String
     Default: https://s3.amazonaws.com/docs.opendata.aws/cloudformation/dask-environment.yaml
@@ -51,26 +50,19 @@ Parameters:
       - 'YES'
       - 'NO'
     Default: 'NO'
-    Description: Use local template files instead of S3 URLs (when using aws cloudformation package / deploy)
+    Description: Use local template files instead of S3 URLs (when using aws cloudformation package / deploy)?
 
 Conditions:
   LocalTemplates: !Equals [!Ref UseLocalTemplates, 'YES']
   S3Templates: !Not [!Condition LocalTemplates]
 
 Resources:
-  DaskEnvironmentStack:
-    Type: AWS::CloudFormation::Stack
-    Condition: S3Templates
-    Properties:
-      TemplateURL: !Ref EnvironmentTemplateLocation
-      Parameters:
-        SagemakerCodeRepo: !Ref SagemakerCodeRepo
-        DaskImage: !Ref InitialImage
-
+  # These resources are used by default, when the stack is launched through the console
+  # (eg via a link from github).  The dask-pipeline and dask-environment templates must
+  # be stored in an S3 bucket, as specified in the location parameters.
   DaskPipelineStack:
     Type: AWS::CloudFormation::Stack
     Condition: S3Templates
-    DependsOn: DaskEnvironmentStack
     Properties:
       TemplateURL: !Ref PipelineTemplateLocation
       Parameters:
@@ -79,23 +71,22 @@ Resources:
         DaskWorkerGitHubOrg: !Ref DaskWorkerGitHubOrg
         DaskWorkerGitSourceBranch: !Ref DaskWorkerGitSourceBranch
         CodeBuildDockerImage: !Ref CodeBuildDockerImage
-        DaskClusterName: !GetAtt DaskEnvironmentStack.Outputs.DaskECSClusterName
+
+  DaskEnvironmentStack:
+    Type: AWS::CloudFormation::Stack
+    Condition: S3Templates
+    DependsOn: DaskPipelineStack
+    Properties:
+      TemplateURL: !Ref EnvironmentTemplateLocation
+      Parameters:
+        SagemakerCodeRepo: !Ref SagemakerCodeRepo
+        DaskImage: !Sub '${DaskPipelineStack.Outputs.ECRRepositoryName}:latest'
 
   # Below are used when deploying from a local copy of the templates, via the AWS CLI
   # with 'aws cloudformation package' and 'aws cloudformation deploy'
-  DaskEnvironmentStackFromLocal:
-    Type: AWS::CloudFormation::Stack
-    Condition: LocalTemplates
-    Properties:
-      TemplateURL: dask-environment.yaml
-      Parameters:
-        SagemakerCodeRepo: !Ref SagemakerCodeRepo
-        DaskImage: !Ref InitialImage
-
   DaskPipelineStackFromLocal:
     Type: AWS::CloudFormation::Stack
     Condition: LocalTemplates
-    DependsOn: DaskEnvironmentStack
     Properties:
       TemplateURL: dask-pipeline.yaml
       Parameters:
@@ -104,7 +95,16 @@ Resources:
         DaskWorkerGitHubOrg: !Ref DaskWorkerGitHubOrg
         DaskWorkerGitSourceBranch: !Ref DaskWorkerGitSourceBranch
         CodeBuildDockerImage: !Ref CodeBuildDockerImage
-        DaskClusterName: !GetAtt DaskEnvironmentStack.Outputs.DaskECSClusterName
+
+  DaskEnvironmentStackFromLocal:
+    Type: AWS::CloudFormation::Stack
+    Condition: LocalTemplates
+    DependsOn: DaskPipelineStackFromLocal
+    Properties:
+      TemplateURL: dask-environment.yaml
+      Parameters:
+        SagemakerCodeRepo: !Ref SagemakerCodeRepo
+        DaskImage: !Sub '${DaskPipelineStackFromLocal.Outputs.ECRRepositoryName}:latest'
   
 Outputs:
   JupyterNotebook:
