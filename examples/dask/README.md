@@ -7,7 +7,7 @@ There are several Jupyter notebooks showing examples of how to work with data di
 
 ### Getting started
 
-[![cloudformation-launch-stack](cloudformation/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=dask&templateURL=https://s3.amazonaws.com/docs.opendata.aws/cloudformation/dask-fargate.yaml)
+[![cloudformation-launch-stack](cloudformation/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=dask&templateURL=https://s3.amazonaws.com/docs.opendata.aws/cloudformation/dask-fargate-nested.yaml)
 
 1. Launch the stack, by default it will be in the `us-east-1` region (since that is the location of most of the weather & climate data) but you can change it to any region you prefer.
 
