@@ -1,0 +1,423 @@
+# This deploys a simple CodeBuild job to create the dask container image
+Parameters:
+  DaskWorkerGitSourceRepo:
+    Type: String
+    Description: GitHub Repository to clone for building the container image for the Dask workers
+    Default: https://github.com/awslabs/amazon-asdi.git
+
+  CodeBuildDockerImage:
+    Type: String
+    Default: aws/codebuild/standard:5.0
+
+Resources:
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource:
+                  Fn::GetAtt:
+                    - CodeBuildLogs
+                    - Arn
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:DescribeDhcpOptions
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeVpcs
+                  - ec2:CreateNetworkInterfacePermission
+                  - ecr:GetAuthorizationToken
+              - Resource: !Sub arn:aws:s3:::${CodePipelineArtifactBucket}/*
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:GetObjectVersion
+              - Resource: !GetAtt EcrDockerRepository.Arn
+                Effect: Allow
+                Action:
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:PutImage
+                  - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
+  
+  CodeBuildLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/codebuild/${AWS::StackName}
+      RetentionInDays: 3
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+
+  # By default, the build specification is defined in this template, but you can also add buildspec.yml
+  # files in your repos to allow for customization.
+  # See:
+  # https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codebuild-project-source.html
+  CodeBuildProject:
+    DependsOn: CodeBuildLogs
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: !Sub
+          - |
+            ---
+            version: 0.2
+            phases:
+              install:
+                commands:
+                  - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2&
+                  - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+              pre_build:
+                  commands:
+                  - printenv
+                  - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
+                  - echo $TAG
+                  - aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
+              build:
+                commands:
+                  - cd examples/dask-worker && docker build --tag $REPOSITORY_URI:$TAG --tag $REPOSITORY_URI:latest . && cd ../..
+              post_build:
+                commands:
+                  - docker push $REPOSITORY_URI:$TAG
+                  - docker push $REPOSITORY_URI:latest
+                  - printf '[{"name":"${ServiceName}","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
+            artifacts:
+              files: build.json
+          - ServiceName: Dask
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Type: LINUX_CONTAINER
+        PrivilegedMode: True
+        Image: !Ref CodeBuildDockerImage
+        EnvironmentVariables:
+          - Name: ACCOUNT_ID
+            Value: !Sub ${AWS::AccountId}
+          - Name: REGION
+            Value: !Sub ${AWS::Region}
+          - Name: REPOSITORY_URI
+            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcrDockerRepository}
+          - Name: REPOSITORY_NAME
+            Value: !Ref DaskWorkerGitSourceRepo
+          - Name: REPOSITORY_BRANCH
+            Value: !Ref DaskWorkerGitSourceBranch
+      Name: !Ref AWS::StackName
+      ServiceRole: !Ref CodeBuildServiceRole
+
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: codepipeline-access
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - ecs:List*
+                  - ecs:Describe*
+                  - ecs:RegisterTaskDefinition
+                  - ecs:UpdateService
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuilds
+                  - codecommit:GetBranch
+                  - codecommit:GetCommit
+                  - codecommit:UploadArchive
+                  - codecommit:GetUploadArchiveStatus
+                  - codecommit:CancelUploadArchive
+                  - iam:PassRole
+              - Resource: !Sub arn:aws:s3:::${CodePipelineArtifactBucket}/*
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+              - Fn::If:
+                  - DeployToECSPipeline
+                  - Resource: !Sub ${NotifyWaitConditionLambdaFunction.Arn}
+                    Effect: Allow
+                    Action:
+                      - lambda:InvokeFunction
+                      - lambda:InvokeAsync
+                  - !Ref "AWS::NoValue"
+    DependsOn:
+      - CodePipelineArtifactBucket
+
+  # This CodePipeline triggers on a commit to the Git branch passed, builds the Docker image
+  # and then deploys the container in the Fargate Cluster.
+  CodePipelineGitHub:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref CodePipelineArtifactBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: App
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              Configuration:
+                Owner: !Ref DaskWorkerGitHubOrg
+                Repo: !Ref DaskWorkerGitSourceRepo
+                Branch: !Ref DaskWorkerGitSourceBranch
+                OAuthToken: !Ref DaskWorkerGitToken
+              OutputArtifacts:
+                - Name: App
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+        - Fn::If:
+            - DeployToECSPipeline
+            - Name: Deploy
+              Actions:
+                - Name: DeployScheduler
+                  ActionTypeId:
+                    Category: Deploy
+                    Owner: AWS
+                    Version: 1
+                    Provider: ECS
+                  Configuration:
+                    ClusterName: !Ref DaskClusterName
+                    ServiceName: !Ref DaskSchedulerServiceName
+                    FileName: build.json
+                  InputArtifacts:
+                    - Name: BuildOutput
+                  RunOrder: 1
+                - Name: DeployWorker
+                  ActionTypeId:
+                    Category: Deploy
+                    Owner: AWS
+                    Version: 1
+                    Provider: ECS
+                  Configuration:
+                    ClusterName: !Ref DaskClusterName
+                    ServiceName: !Ref DaskWorkerServiceName
+                    FileName: build.json
+                  InputArtifacts:
+                    - Name: BuildOutput
+                  RunOrder: 2
+                - Name: NotifyCloudformation
+                  ActionTypeId:
+                    Category: Invoke
+                    Owner: AWS
+                    Version: "1"
+                    Provider: Lambda
+                  Configuration:
+                    FunctionName: !Ref NotifyWaitConditionLambdaFunction
+                  RunOrder: 3
+            - !Ref "AWS::NoValue"
+          
+    DependsOn:
+      - CodePipelineArtifactBucket
+      - CodeBuildProject
+      - CodePipelineServiceRole
+
+  DeployWaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Condition: DeployToECSPipeline
+
+  DeployWaitCondition:
+    Type: AWS::CloudFormation::WaitCondition
+    Condition: DeployToECSPipeline
+    Properties:
+      Count: 1
+      Handle: !Ref DeployWaitHandle
+      Timeout: "900"
+  
+  NotifyWaitConditionLambdaFunction:
+    Type: AWS::Lambda::Function
+    Condition: DeployToECSPipeline
+    Properties:
+      Handler: index.handler
+      Role: !GetAtt LambdaNotifyRole.Arn
+      Code:
+        ZipFile: !Sub |
+          import json
+          import boto3
+          import urllib.request
+          code_pipeline = boto3.client('codepipeline')
+          def handler(event, context):
+            job_id = event['CodePipeline.job']['id']
+            url = '${DeployWaitHandle}'
+            headers = { "Content-Type": "" }
+            data = { "Status": "SUCCESS", "Reason": "Compilation Succeeded", "UniqueId": "Dask", "Data": "Compilation Succeeded" }
+            try:
+              req = urllib.request.Request(url, headers=headers, data=bytes(json.dumps(data), encoding="utf-8"), method='PUT')
+              response = urllib.request.urlopen(req)
+              code_pipeline.put_job_success_result(jobId=job_id)
+            except Exception as e:
+              print("failure: " + str(e))
+              code_pipeline.put_job_failure_result(jobId=job_id, failureDetails={'message': str(e), 'type': 'JobFailed'})
+      Runtime: python3.7
+      Timeout: 10
+  
+  LambdaNotifyRole:
+    Type: AWS::IAM::Role
+    Condition: DeployToECSPipeline
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: root
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Resource: "*"
+            Effect: Allow
+            Action:
+              - codepipeline:PutJobSuccessResult
+              - codepipeline:PutJobFailureResult
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: '*'
+
+  EcrDockerRepository:
+    Type: AWS::ECR::Repository
+
+  CleanECROnDelete:
+    DependsOn: CleanECROnDeleteLambda
+    Type: Custom::CleanECR
+    Properties:
+      ServiceToken: 
+        Fn::GetAtt: 
+          - "CleanECROnDeleteLambda"
+          - "Arn"
+      RepositoryName: !Ref EcrDockerRepository
+
+  CleanECROnDeleteLambda:
+    DependsOn: EcrDockerRepository
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Code: 
+        ZipFile: 
+          !Sub |
+            import json, boto3, logging
+            import cfnresponse
+            logger = logging.getLogger()
+            logger.setLevel(logging.INFO)
+    
+            def lambda_handler(event, context):
+                logger.info("event: {}".format(event))
+                try:
+                    repo = event['ResourceProperties']['RepositoryName']
+                    logger.info("bucket: {}, event['RequestType']: {}".format(repo,event['RequestType']))
+                    if event['RequestType'] == 'Delete':
+                        client = boto3.client('ecr')
+                        resp = client.list_images(repositoryName=repo)
+                        if 'imageIds' in resp:
+                          images = resp['imageIds']
+                          image_ids = [imageDigest for imageDigest in images]
+                          if len(image_ids) > 0:
+                            client.batch_delete_image(repositoryName=repo, imageIds=image_ids)
+    
+                    sendResponseCfn(event, context, cfnresponse.SUCCESS)
+                except Exception as e:
+                    logger.info("Exception: {}".format(e))
+                    sendResponseCfn(event, context, cfnresponse.FAILED)
+    
+            def sendResponseCfn(event, context, responseStatus):
+                responseData = {}
+                responseData['Data'] = {}
+                cfnresponse.send(event, context, responseStatus, responseData, "CustomResourcePhysicalID")            
+    
+      Handler: "index.lambda_handler"
+      Runtime: python3.7
+      MemorySize: 128
+      Timeout: 60
+      Role : !GetAtt CleanECROnDeleteLambdaRole.Arn
+
+  CleanECROnDeleteLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: !Join ['-', [!Ref 'AWS::StackName', 'CleanECROnDeleteLambdaPolicy'] ]
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - ecr:ListImages
+              - ecr:batchDeleteImage
+            Resource: !GetAtt EcrDockerRepository.Arn
+          # - Effect: Allow
+          #   Action:
+          #   - logs:CreateLogGroup
+          #   - logs:CreateLogStream
+          #   - logs:PutLogEvents
+          #   Resource: '*'
+
