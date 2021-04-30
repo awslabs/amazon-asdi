@@ -4,6 +4,19 @@ Parameters:
     Description: Github Repository for loading into the Sagemaker Jupyter environment
     Default: https://github.com/awslabs/amazon-asdi.git
 
+  SagemakerNotebookInstance:
+    Type: String
+    Description: Sagemaker Notebook instance type
+    AllowedValues:
+      - ml.t3.medium
+      - ml.t3.large
+      - ml.t3.xlarge
+      - ml.t3.2xlarge
+      - ml.m5.large
+      - ml.m5.2xlarge
+      - ml.m5.4xlarge
+    Default: ml.m5.2xlarge
+
   DaskImage:
     Type: String
     Default: daskdev/dask:latest
@@ -17,7 +30,7 @@ Parameters:
   DaskWorkerMemory:
     Type: String
     Default: '8192'
-    Description: Memory in GB for dask workers
+    Description: Memory in MiB for dask workers
 
   DaskWorkerSpotPricing:
     Type: String
@@ -520,7 +533,7 @@ Resources:
   DaskNotebook:
     Type: AWS::SageMaker::NotebookInstance
     Properties:
-      InstanceType: ml.m5.2xlarge
+      InstanceType: !Ref SagemakerNotebookInstance
       RoleArn:
         Fn::GetAtt:
           - SagemakerRole

@@ -2,6 +2,36 @@
 # It will:
 # 1) Create a pipeline to build a container image for dask and other necessary software
 # 2) Create a new dask environment with VPC, ECS cluster and SageMaker notebook
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: GitHub source details for dask container build artefacts
+        Parameters:
+          - DaskWorkerGitHubOrg
+          - DaskWorkerGitSourceBranch
+          - DaskWorkerGitSourceRepo
+          - DaskWorkerGitToken
+      - Label:
+          default: SageMaker notebook settings
+        Parameters:
+          - SagemakerCodeRepo
+          - SagemakerNotebookInstance
+      - Label:
+          default: Dask worker task settings
+        Parameters:
+          - UseSpotPricing
+          - DaskWorkerCPU
+          - DaskWorkerMemory
+      - Label:
+          default: Build settings
+        Parameters:
+          - CodeBuildDockerImage
+          - UseLocalTemplates
+          - EnvironmentTemplateLocation 
+          - PipelineTemplateLocation
+
 Parameters:
   DaskWorkerGitToken:
     Type: String
@@ -14,6 +44,19 @@ Parameters:
     Type: String
     Description: Github Repository for loading into the Sagemaker Jupyter environment
     Default: https://github.com/awslabs/amazon-asdi.git
+
+  SagemakerNotebookInstance:
+    Type: String
+    Description: SageMaker Notebook instance type
+    AllowedValues:
+      - ml.t3.medium
+      - ml.t3.large
+      - ml.t3.xlarge
+      - ml.t3.2xlarge
+      - ml.m5.large
+      - ml.m5.2xlarge
+      - ml.m5.4xlarge
+    Default: ml.m5.2xlarge
 
   DaskWorkerGitSourceRepo:
     Type: String
@@ -60,6 +103,34 @@ Parameters:
     Default: 'NO'
     Description: Use Fargate spot pricing for dask workers to reduce cost?
 
+  DaskWorkerCPU:
+    Type: String
+    AllowedValues:
+      - '1'
+      - '2'
+      - '4'
+    Default: '1'
+    Description: Number of vCPUs to allocate to each dask worker task
+
+  DaskWorkerMemory:
+    Type: String
+    AllowedValues:
+      - '2048'
+      - '4096'
+      - '8192'
+      - '16384'
+    Default: '8192'
+    Description: Amount of memory in MiB to allocate to each dask worker task
+
+Mappings:
+  FargateCPUMap:
+    '1':
+      Value: '1024'
+    '2':
+      Value: '2048'
+    '4':
+      Value: '4096'
+
 Conditions:
   LocalTemplates: !Equals [!Ref UseLocalTemplates, 'YES']
   S3Templates: !Not [!Condition LocalTemplates]
@@ -90,6 +161,8 @@ Resources:
         SagemakerCodeRepo: !Ref SagemakerCodeRepo
         DaskImage: !Sub '${DaskPipelineStack.Outputs.ECRRepositoryName}:latest'
         DaskWorkerSpotPricing: !Ref UseSpotPricing
+        DaskWorkerCPU: !FindInMap [FargateCPUMap, !Ref DaskWorkerCPU, 'Value']
+        DaskWorkerMemory: !Ref DaskWorkerMemory
 
   # Below are used when deploying from a local copy of the templates, via the AWS CLI
   # with 'aws cloudformation package' and 'aws cloudformation deploy'
@@ -115,6 +188,8 @@ Resources:
         SagemakerCodeRepo: !Ref SagemakerCodeRepo
         DaskImage: !Sub '${DaskPipelineStackFromLocal.Outputs.ECRRepositoryName}:latest'
         DaskWorkerSpotPricing: !Ref UseSpotPricing
+        DaskWorkerCPU: !FindInMap [FargateCPUMap, !Ref DaskWorkerCPU, 'Value']
+        DaskWorkerMemory: !Ref DaskWorkerMemory
   
 Outputs:
   JupyterNotebook:
