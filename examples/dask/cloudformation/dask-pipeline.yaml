@@ -433,7 +433,7 @@ Resources:
                 data = { "Status": "SUCCESS", "Reason": "Compilation Succeeded", "UniqueId": "Dask", "Data": "Compilation Succeeded" }
                 req = urllib.request.Request(url, headers=headers, data=bytes(json.dumps(data), encoding="utf-8"), method='PUT')
                 response = urllib.request.urlopen(req)
-                code_pipeline.put_job_success_result(jobId=job_id)
+              code_pipeline.put_job_success_result(jobId=job_id)
             except Exception as e:
               print("failure: " + str(e))
               code_pipeline.put_job_failure_result(jobId=job_id, failureDetails={'message': str(e), 'type': 'JobFailed'})
