@@ -1,3 +1,5 @@
+# This deploys the pipeline for building and deploying updated dask container images
+# It depends on the dask ECS environment being created first
 Parameters:
   DaskWorkerGitToken:
     Type: String
@@ -5,11 +7,6 @@ Parameters:
     MinLength: 40
     AllowedPattern: "[a-zA-Z0-9_]+"
     NoEcho: true
-
-  SagemakerCodeRepo:
-    Type: String
-    Description: Github Repository for loading into the Sagemaker Jupyter environment
-    Default: https://github.com/awslabs/amazon-asdi.git
 
   DaskWorkerGitSourceRepo:
     Type: String
@@ -30,10 +27,24 @@ Parameters:
     Type: String
     Default: aws/codebuild/standard:5.0
 
-  InitialImage:
+  DaskClusterName:
     Type: String
-    Default: daskdev/dask:2.9.2
-    Description: Initial image to use for the Dask workers before our custom image is built
+    Default: 'None'
+    Description: Name of the ECS cluster to deploy into
+
+  DaskWorkerServiceName:
+    Type: String
+    Default: Dask-Worker
+    Description: Name of the dask worker ECS service
+
+  DaskSchedulerServiceName:
+    Type: String
+    Default: Dask-Scheduler
+    Description: Name of the dask scheduler ECS service
+
+Conditions:
+  BuildOnlyPipeline: !Equals [!Ref DaskClusterName, 'None']
+  DeployToECSPipeline: !Not [!Condition BuildOnlyPipeline]
 
 Resources:
   CodePipelineArtifactBucket:
@@ -192,7 +203,7 @@ Resources:
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
 
-                  # By default, the build specification is defined in this template, but you can also add buildspec.yml
+  # By default, the build specification is defined in this template, but you can also add buildspec.yml
   # files in your repos to allow for customization.
   # See:
   # https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html
@@ -222,14 +233,15 @@ Resources:
                   - aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
               build:
                 commands:
-                  - cd examples/dask-worker && docker build --tag $REPOSITORY_URI:$TAG . && cd ../..
+                  - cd examples/dask-worker && docker build --tag $REPOSITORY_URI:$TAG --tag $REPOSITORY_URI:latest . && cd ../..
               post_build:
                 commands:
                   - docker push $REPOSITORY_URI:$TAG
+                  - docker push $REPOSITORY_URI:latest
                   - printf '[{"name":"${ServiceName}","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
             artifacts:
               files: build.json
-          - ServiceName: Worker
+          - ServiceName: Dask
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
@@ -336,34 +348,39 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
               RunOrder: 1
-        - Name: Deploy
+        - Fn::If:
+            - DeployToECSPipeline
+            - Name: Deploy
+              Actions:
+                - Name: DeployScheduler
+                  ActionTypeId:
+                    Category: Deploy
+                    Owner: AWS
+                    Version: 1
+                    Provider: ECS
+                  Configuration:
+                    ClusterName: !Ref DaskClusterName
+                    ServiceName: !Ref DaskSchedulerServiceName
+                    FileName: build.json
+                  InputArtifacts:
+                    - Name: BuildOutput
+                  RunOrder: 1
+                - Name: DeployWorker
+                  ActionTypeId:
+                    Category: Deploy
+                    Owner: AWS
+                    Version: 1
+                    Provider: ECS
+                  Configuration:
+                    ClusterName: !Ref DaskClusterName
+                    ServiceName: !Ref DaskWorkerServiceName
+                    FileName: build.json
+                  InputArtifacts:
+                    - Name: BuildOutput
+                  RunOrder: 2
+            - !Ref "AWS::NoValue"
+        - Name: Notify
           Actions:
-            - Name: DeployScheduler
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Version: 1
-                Provider: ECS
-              Configuration:
-                ClusterName: !Ref DaskCluster
-                ServiceName: !GetAtt DaskSchedulerService.Name
-                FileName: build.json
-              InputArtifacts:
-                - Name: BuildOutput
-              RunOrder: 1
-            - Name: DeployWorker
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Version: 1
-                Provider: ECS
-              Configuration:
-                ClusterName: !Ref DaskCluster
-                ServiceName: !GetAtt DaskWorkerService.Name
-                FileName: build.json
-              InputArtifacts:
-                - Name: BuildOutput
-              RunOrder: 2
             - Name: NotifyCloudformation
               ActionTypeId:
                 Category: Invoke
@@ -372,7 +389,7 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: !Ref NotifyWaitConditionLambdaFunction
-              RunOrder: 3
+              RunOrder: 1
           
     DependsOn:
       - CodePipelineArtifactBucket
@@ -398,16 +415,24 @@ Resources:
         ZipFile: !Sub |
           import json
           import boto3
+          import json
           import urllib.request
           code_pipeline = boto3.client('codepipeline')
+          cfn = boto3.client('cloudformation')
           def handler(event, context):
             job_id = event['CodePipeline.job']['id']
             url = '${DeployWaitHandle}'
             headers = { "Content-Type": "" }
-            data = { "Status": "SUCCESS", "Reason": "Compilation Succeeded", "UniqueId": "Dask", "Data": "Compilation Succeeded" }
             try:
-              req = urllib.request.Request(url, headers=headers, data=bytes(json.dumps(data), encoding="utf-8"), method='PUT')
-              response = urllib.request.urlopen(req)
+              cfn_response = cfn.describe_stacks(
+                StackName='${AWS::StackName}'
+              )
+              print("response: " + json.dumps(cfn_response, default=str))
+              stack_status = cfn_response['Stacks'][0]['StackStatus']
+              if stack_status == 'CREATE_IN_PROGRESS':
+                data = { "Status": "SUCCESS", "Reason": "Compilation Succeeded", "UniqueId": "Dask", "Data": "Compilation Succeeded" }
+                req = urllib.request.Request(url, headers=headers, data=bytes(json.dumps(data), encoding="utf-8"), method='PUT')
+                response = urllib.request.urlopen(req)
               code_pipeline.put_job_success_result(jobId=job_id)
             except Exception as e:
               print("failure: " + str(e))
@@ -438,6 +463,7 @@ Resources:
             Action:
               - codepipeline:PutJobSuccessResult
               - codepipeline:PutJobFailureResult
+              - cloudformation:DescribeStacks
           - Effect: Allow
             Action:
               - logs:CreateLogGroup
@@ -530,405 +556,7 @@ Resources:
           #   - logs:PutLogEvents
           #   Resource: '*'
 
-  DaskVpc:
-    Type: AWS::EC2::VPC
-    Properties:
-      CidrBlock: 10.0.0.0/16
-      EnableDnsHostnames: true
-      EnableDnsSupport: true
-      InstanceTenancy: default
-      Tags:
-        - Key: Name
-          Value: dask-fargate/MyVpc
-  PublicSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      CidrBlock: 10.0.0.0/18
-      VpcId:
-        Ref: DaskVpc
-      AvailabilityZone:
-        Fn::Select:
-          - 0
-          - Fn::GetAZs: ""
-      MapPublicIpOnLaunch: true
-  PublicSubnet1RouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId:
-        Ref: DaskVpc
-      Tags:
-        - Key: Name
-          Value: dask-fargate/MyVpc/PublicSubnet1
-  PublicSubnet1RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId:
-        Ref: PublicSubnet1RouteTable
-      SubnetId:
-        Ref: PublicSubnet1
-  PublicSubnet1DefaultRoute:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId:
-        Ref: PublicSubnet1RouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId:
-        Ref: InternetGateway
-    DependsOn:
-      - VPCGatewayA
-  PublicSubnet1EIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-      Tags:
-        - Key: Name
-          Value: dask-fargate/MyVpc/PublicSubnet1
-  InternetGateway:
-    Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags:
-        - Key: Name
-          Value: dask-fargate/MyVpc
-  VPCGatewayA:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      VpcId:
-        Ref: DaskVpc
-      InternetGatewayId:
-        Ref: InternetGateway
-  LogGroupScheduler:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/${AWS::StackName}/dask/scheduler
-      RetentionInDays: 3
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
-  LogGroupWorker:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/${AWS::StackName}/dask/worker
-      RetentionInDays: 3
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
-  ECSExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-        Version: "2012-10-17"
-  ECSExecutionRolePolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Action:
-              - ecr:BatchCheckLayerAvailability
-              - ecr:GetDownloadUrlForLayer
-              - ecr:BatchGetImage
-              - ecr:GetAuthorizationToken
-            Effect: Allow
-            Resource: "*"
-          - Action:
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-            Effect: Allow
-            Resource:
-              Fn::GetAtt:
-                - LogGroupScheduler
-                - Arn
-          - Action:
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-            Effect: Allow
-            Resource:
-              Fn::GetAtt:
-                - LogGroupWorker
-                - Arn
-        Version: "2012-10-17"
-      PolicyName: ECSExecutionRolePolicy
-      Roles:
-        - Ref: ECSExecutionRole
-  DaskCluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: !Join ["-", [!Ref "AWS::StackName", "Fargate-Dask-Cluster"]]
-  DaskClusterPrivateNS:
-    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
-    Properties:
-      Name: local-dask
-      Vpc:
-        Ref: DaskVpc
-  SchedulerDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      ContainerDefinitions:
-        - Command:
-            - dask-scheduler
-            - --dashboard
-            - --dashboard-address
-            - '8787'
-          Cpu: 4096
-          Essential: true
-          Image: daskdev/dask:2.9.2
-          LogConfiguration: 
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: LogGroupScheduler
-              awslogs-stream-prefix: ecs
-              awslogs-region:
-                Ref: AWS::Region
-          Memory: 30720
-          MemoryReservation: 30720
-          Name: Worker
-      Cpu: "4096"
-      ExecutionRoleArn:
-        Fn::GetAtt:
-          - ECSExecutionRole
-          - Arn
-      Family: Dask-Scheduler
-      Memory: "30720"
-      NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - FARGATE
-      TaskRoleArn:
-        Fn::GetAtt:
-          - ECSExecutionRole
-          - Arn
-  WorkerDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      ContainerDefinitions:
-        - Command:
-            - dask-worker
-            - dask-scheduler.local-dask:8786
-            - --memory-limit
-            - '7000MB'
-            - --worker-port
-            - '9000'
-            - --no-nanny
-            - --no-dashboard
-            - --death-timeout
-            - '30'
-            - --nthreads
-            - '2'
-            - --nprocs
-            - '1'
-            - --reconnect
-          Cpu: 1024
-          Essential: true
-          Image: daskdev/dask:2.19.0
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: LogGroupWorker
-              awslogs-stream-prefix: ecs
-              awslogs-region:
-                Ref: AWS::Region
-          Memory: 8192
-          MemoryReservation: 8192
-          Name: Worker
-      Cpu: "1024"
-      ExecutionRoleArn:
-        Fn::GetAtt:
-          - ECSExecutionRole
-          - Arn
-      Family: Dask-Worker
-      Memory: "8192"
-      NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - FARGATE
-      TaskRoleArn:
-        Fn::GetAtt:
-          - ECSExecutionRole
-          - Arn
-  DaskSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enable Scheduler ports access
-      GroupName: DaskSecurityGroup
-      SecurityGroupEgress:
-        - CidrIp: 0.0.0.0/0
-          Description: Allow all outbound traffic by default
-          IpProtocol: "-1"
-      SecurityGroupIngress:
-        - CidrIp: 0.0.0.0/0
-          Description: from 0.0.0.0/0:p1
-          FromPort: 8786
-          IpProtocol: tcp
-          ToPort: 8789
-        - CidrIp: 0.0.0.0/0
-          Description: from 0.0.0.0/0:p2
-          FromPort: 9000
-          IpProtocol: tcp
-          ToPort: 9002
-      VpcId:
-        Ref: DaskVpc
-  DaskSchedulerService:
-    Type: AWS::ECS::Service
-    Properties:
-      Cluster:
-        Ref: DaskCluster
-      DeploymentConfiguration:
-        MaximumPercent: 200
-        MinimumHealthyPercent: 100
-      DesiredCount: 1
-      EnableECSManagedTags: false
-      LaunchType: FARGATE
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          SecurityGroups:
-            - Fn::GetAtt:
-                - DaskSecurityGroup
-                - GroupId
-          Subnets:
-            - Ref: PublicSubnet1
-      ServiceName: Dask-Scheduler
-      ServiceRegistries:
-        - RegistryArn:
-            Fn::GetAtt:
-              - DaskSchedulerServiceDiscovery
-              - Arn
-      TaskDefinition:
-        Ref: SchedulerDefinition
-  DaskSchedulerServiceDiscovery:
-    Type: AWS::ServiceDiscovery::Service
-    Properties:
-      DnsConfig:
-        DnsRecords:
-          - TTL: 5
-            Type: A
-        NamespaceId:
-          Fn::GetAtt:
-            - DaskClusterPrivateNS
-            - Id
-        RoutingPolicy: MULTIVALUE
-      HealthCheckCustomConfig:
-        FailureThreshold: 1
-      Name: Dask-Scheduler
-      NamespaceId:
-        Fn::GetAtt:
-          - DaskClusterPrivateNS
-          - Id
-  DaskWorkerService:
-    Type: AWS::ECS::Service
-    Properties:
-      Cluster:
-        Ref: DaskCluster
-      DeploymentConfiguration:
-        MaximumPercent: 200
-        MinimumHealthyPercent: 100
-      DesiredCount: 0
-      EnableECSManagedTags: false
-      LaunchType: FARGATE
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          SecurityGroups:
-            - Fn::GetAtt:
-                - DaskSecurityGroup
-                - GroupId
-          Subnets:
-            - Ref: PublicSubnet1
-      ServiceName: Dask-Worker
-      TaskDefinition:
-        Ref: WorkerDefinition
-
-  SagemakerRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: sagemaker.amazonaws.com
-        Version: "2012-10-17"
-  SagemakerPolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Action:
-              - s3:*
-              - ecs:*
-              - logs:*
-            Effect: Allow
-            Resource: "*"
-        Version: "2012-10-17"
-      PolicyName: notebookAccessPolicy
-      Roles:
-        - Ref: SagemakerRole
-
-  NotebookLifecycleConfig:
-    Type: AWS::SageMaker::NotebookInstanceLifecycleConfig
-    Properties:
-        OnCreate:
-        - Content:
-            Fn::Base64: |
-                #!/bin/sh
-
-                set -e
-                cat > /home/ec2-user/setup.sh << EOF
-                #!/bin/bash
-                sleep 10
-                echo "Creating daskpy3 conda environment"
-                conda create --name daskpy3 python="3.7.9" -y
-                source activate daskpy3
-                conda install -c conda basemap proj4 nodejs ipywidgets -y 
-                pip install zarr==2.3.2 rechunker==0.3.2 ipykernel boto3 dask==2021.1.1 distributed==2021.1.1 tornado==6.1 cloudpickle==1.6.0 msgpack==1.0.2 blosc==1.10.2 numpy==1.19.5 pandas==1.2.1 lz4==3.1.3 netcdf4==1.5.5.1 xarray==0.17.0 bokeh==2.2.3 s3fs==0.4.2 fsspec==0.7.4 h5netcdf==0.8.1 h5py==3.1.0
-                python -m ipykernel install --user --name daskpy3 --display-name "conda_daskpy3"
-                echo "Updating Jupyter config options"
-                sed -i.bak 's/^#c.NotebookApp.iopub_data_rate_limit.*$/c.NotebookApp.iopub_data_rate_limit = 1.0e10/' ~/.jupyter/
-                sed -i.bak 's/^#c.NotebookApp.iopub_msg_rate_limit.*$/c.NotebookApp.iopub_msg_rate_limit = 1.0e10/' ~/.jupyter/
-                jupyter_notebook_config.py
-                source /home/ec2-user/anaconda3/bin/deactivate
-                source activate JupyterSystemEnv
-                jupyter labextension install @jupyter-widgets/jupyterlab-manager@1.1
-                source /home/ec2-user/anaconda3/bin/deactivate
-                echo "Finished!"
-                EOF
-            
-                chown ec2-user:ec2-user /home/ec2-user/setup.sh
-                chmod +x /home/ec2-user/setup.sh
-
-                sudo -u ec2-user -i nohup /home/ec2-user/setup.sh >/home/ec2-user/output.log 2>&1 &
-
-  DaskNotebook:
-    Type: AWS::SageMaker::NotebookInstance
-    Properties:
-      InstanceType: ml.m5.2xlarge
-      RoleArn:
-        Fn::GetAtt:
-          - SagemakerRole
-          - Arn
-      DefaultCodeRepository: !Ref SagemakerCodeRepo
-      DirectInternetAccess: Enabled
-      NotebookInstanceName: !Join ['-', [!Ref 'AWS::StackName', 'DaskNotebook'] ]
-      LifecycleConfigName:  !GetAtt NotebookLifecycleConfig.NotebookInstanceLifecycleConfigName
-      RootAccess: Enabled
-      SecurityGroupIds:
-        - Fn::GetAtt:
-            - DaskSecurityGroup
-            - GroupId
-      SubnetId:
-        Ref: PublicSubnet1
-      VolumeSizeInGB: 50
-
 Outputs:
-  JupyterNotebook:
-      Value: !Join
-      - ''
-      - - https://
-        - !Ref 'AWS::Region'
-        - .console.aws.amazon.com/sagemaker/home?region=
-        - !Ref 'AWS::Region'
-        - '#/notebook-instances/openNotebook/'
-        - !GetAtt 'DaskNotebook.NotebookInstanceName'
-        - '?view=lab'
+  ECRRepositoryName:
+    Description: Name of the ECR repository that contains the dask container image
+    Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcrDockerRepository}

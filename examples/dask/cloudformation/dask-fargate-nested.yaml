@@ -1,0 +1,202 @@
+# This template provides a quick start distributed environment for dask on AWS.
+# It will:
+# 1) Create a pipeline to build a container image for dask and other necessary software
+# 2) Create a new dask environment with VPC, ECS cluster and SageMaker notebook
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: GitHub source details for dask container build artefacts
+        Parameters:
+          - DaskWorkerGitHubOrg
+          - DaskWorkerGitSourceBranch
+          - DaskWorkerGitSourceRepo
+          - DaskWorkerGitToken
+      - Label:
+          default: SageMaker notebook settings
+        Parameters:
+          - SagemakerCodeRepo
+          - SagemakerNotebookInstance
+      - Label:
+          default: Dask worker task settings
+        Parameters:
+          - UseSpotPricing
+          - DaskWorkerCPU
+          - DaskWorkerMemory
+      - Label:
+          default: Build settings
+        Parameters:
+          - CodeBuildDockerImage
+          - UseLocalTemplates
+          - EnvironmentTemplateLocation 
+          - PipelineTemplateLocation
+
+Parameters:
+  DaskWorkerGitToken:
+    Type: String
+    Description: GitHub OAuth Token for accessing the Dask worker repository
+    MinLength: 40
+    AllowedPattern: "[a-zA-Z0-9_]+"
+    NoEcho: true
+
+  SagemakerCodeRepo:
+    Type: String
+    Description: Github Repository for loading into the Sagemaker Jupyter environment
+    Default: https://github.com/awslabs/amazon-asdi.git
+
+  SagemakerNotebookInstance:
+    Type: String
+    Description: SageMaker Notebook instance type
+    AllowedValues:
+      - ml.t3.medium
+      - ml.t3.large
+      - ml.t3.xlarge
+      - ml.t3.2xlarge
+      - ml.m5.large
+      - ml.m5.2xlarge
+      - ml.m5.4xlarge
+    Default: ml.m5.2xlarge
+
+  DaskWorkerGitSourceRepo:
+    Type: String
+    Description: GitHub Repository for building the container image for the Dask workers
+    Default: amazon-asdi
+
+  DaskWorkerGitHubOrg:
+    Type: String
+    Description: GitHub organization for Dask Worker repository
+    Default: awslabs
+
+  DaskWorkerGitSourceBranch:
+    Type: String
+    Description: GitHub Repository Branch for Dask workers
+    Default: main
+
+  CodeBuildDockerImage:
+    Type: String
+    Default: aws/codebuild/standard:5.0
+
+  EnvironmentTemplateLocation:
+    Type: String
+    Default: https://s3.amazonaws.com/docs.opendata.aws/cloudformation/dask-environment.yaml
+    Description: Location of the Dask environment CloudFormation template
+
+  PipelineTemplateLocation:
+    Type: String
+    Default: https://s3.amazonaws.com/docs.opendata.aws/cloudformation/dask-pipeline.yaml
+    Description: Location of the Dask pipeline CloudFormation template
+
+  UseLocalTemplates:
+    Type: String
+    AllowedValues:
+      - 'YES'
+      - 'NO'
+    Default: 'NO'
+    Description: Use local template files instead of S3 URLs (when using aws cloudformation package / deploy)?
+
+  UseSpotPricing:
+    Type: String
+    AllowedValues:
+      - 'YES'
+      - 'NO'
+    Default: 'NO'
+    Description: Use Fargate spot pricing for dask workers to reduce cost?
+
+  DaskWorkerCPU:
+    Type: String
+    AllowedValues:
+      - '1'
+      - '2'
+      - '4'
+    Default: '1'
+    Description: Number of vCPUs to allocate to each dask worker task
+
+  DaskWorkerMemory:
+    Type: String
+    AllowedValues:
+      - '2048'
+      - '4096'
+      - '8192'
+      - '16384'
+    Default: '8192'
+    Description: Amount of memory in MiB to allocate to each dask worker task
+
+Mappings:
+  FargateCPUMap:
+    '1':
+      Value: '1024'
+    '2':
+      Value: '2048'
+    '4':
+      Value: '4096'
+
+Conditions:
+  LocalTemplates: !Equals [!Ref UseLocalTemplates, 'YES']
+  S3Templates: !Not [!Condition LocalTemplates]
+
+Resources:
+  # These resources are used by default, when the stack is launched through the console
+  # (eg via a link from github).  The dask-pipeline and dask-environment templates must
+  # be stored in an S3 bucket, as specified in the location parameters.
+  DaskPipelineStack:
+    Type: AWS::CloudFormation::Stack
+    Condition: S3Templates
+    Properties:
+      TemplateURL: !Ref PipelineTemplateLocation
+      Parameters:
+        DaskWorkerGitToken: !Ref DaskWorkerGitToken
+        DaskWorkerGitSourceRepo: !Ref DaskWorkerGitSourceRepo
+        DaskWorkerGitHubOrg: !Ref DaskWorkerGitHubOrg
+        DaskWorkerGitSourceBranch: !Ref DaskWorkerGitSourceBranch
+        CodeBuildDockerImage: !Ref CodeBuildDockerImage
+
+  DaskEnvironmentStack:
+    Type: AWS::CloudFormation::Stack
+    Condition: S3Templates
+    DependsOn: DaskPipelineStack
+    Properties:
+      TemplateURL: !Ref EnvironmentTemplateLocation
+      Parameters:
+        SagemakerCodeRepo: !Ref SagemakerCodeRepo
+        DaskImage: !Sub '${DaskPipelineStack.Outputs.ECRRepositoryName}:latest'
+        DaskWorkerSpotPricing: !Ref UseSpotPricing
+        DaskWorkerCPU: !FindInMap [FargateCPUMap, !Ref DaskWorkerCPU, 'Value']
+        DaskWorkerMemory: !Ref DaskWorkerMemory
+
+  # Below are used when deploying from a local copy of the templates, via the AWS CLI
+  # with 'aws cloudformation package' and 'aws cloudformation deploy'
+  DaskPipelineStackFromLocal:
+    Type: AWS::CloudFormation::Stack
+    Condition: LocalTemplates
+    Properties:
+      TemplateURL: dask-pipeline.yaml
+      Parameters:
+        DaskWorkerGitToken: !Ref DaskWorkerGitToken
+        DaskWorkerGitSourceRepo: !Ref DaskWorkerGitSourceRepo
+        DaskWorkerGitHubOrg: !Ref DaskWorkerGitHubOrg
+        DaskWorkerGitSourceBranch: !Ref DaskWorkerGitSourceBranch
+        CodeBuildDockerImage: !Ref CodeBuildDockerImage
+
+  DaskEnvironmentStackFromLocal:
+    Type: AWS::CloudFormation::Stack
+    Condition: LocalTemplates
+    DependsOn: DaskPipelineStackFromLocal
+    Properties:
+      TemplateURL: dask-environment.yaml
+      Parameters:
+        SagemakerCodeRepo: !Ref SagemakerCodeRepo
+        DaskImage: !Sub '${DaskPipelineStackFromLocal.Outputs.ECRRepositoryName}:latest'
+        DaskWorkerSpotPricing: !Ref UseSpotPricing
+        DaskWorkerCPU: !FindInMap [FargateCPUMap, !Ref DaskWorkerCPU, 'Value']
+        DaskWorkerMemory: !Ref DaskWorkerMemory
+  
+Outputs:
+  JupyterNotebook:
+    Description: URL of the Sagemaker Notebook instance
+    Value:
+      Fn::If:
+        - LocalTemplates
+        - !GetAtt DaskEnvironmentStackFromLocal.Outputs.JupyterNotebook
+        - !GetAtt DaskEnvironmentStack.Outputs.JupyterNotebook
+

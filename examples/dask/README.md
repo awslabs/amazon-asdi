@@ -7,7 +7,7 @@ There are several Jupyter notebooks showing examples of how to work with data di
 
 ### Getting started
 
-[![cloudformation-launch-stack](cloudformation/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=dask&templateURL=https://s3.amazonaws.com/docs.opendata.aws/cloudformation/dask-fargate.yaml)
+[![cloudformation-launch-stack](cloudformation/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=dask&templateURL=https://s3.amazonaws.com/docs.opendata.aws/cloudformation/dask-fargate-nested.yaml)
 
 1. Launch the stack, by default it will be in the `us-east-1` region (since that is the location of most of the weather & climate data) but you can change it to any region you prefer.
 
@@ -37,4 +37,17 @@ The Jupyter notebook environment will be set up with a kernel called `conda_dask
 
 ### Architecture
 
-![architecture](cloudformation/architecture.png)
+![architecture](cloudformation/dask-architecture.png)
+
+The diagram above shows the architecture at a high level.  The CloudFormation template deploys as two nested stacks, one which deploys a pipeline to build the container image, the second to create the dask environment and associated resources.
+
+The environment includes:
+1. A Virtual Private Cloud (VPC) with security groups to restrict traffic
+1. A public subnet with NAT Gateway for the scheduler and notebook, and a single private subnet for the dask workers
+1. A S3 Gateway endpoint to enable dask workers to access S3 without traversing the NAT Gateway
+1. An Elastic Container Service (ECS) cluster
+1. ECS service definitions for the dask scheduler and dask workers
+1. A SageMaker Notebook instance
+
+When first deployed, the pipeline will create the container image which is deployed into the dask environment.  Future updates to the specified GitHub repository will trigger an automatic rebuild of the container image.  
+
