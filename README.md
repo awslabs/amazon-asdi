@@ -47,7 +47,7 @@ There are two main ways to contribute to the ASDI Program:
 
 ## ASDI data for supporting research
 
-### AWS Cloud Credits for Research
+### AWS Cloud Credits
 
 If you would like to test a cloud-based idea for sustainability, consider requesting a cloud grant to offset the costs of experimentation. The [AWS Promotional Credit Program managed by the Amazon Sustainability Data Initiative](https://amazonsdi.com/credits) awards grants of AWS credits to support those interested in prototyping new sustainability related solutions on AWS, or transfer existing workflows from on-premise to the cloud.
 
