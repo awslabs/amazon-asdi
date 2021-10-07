@@ -5,7 +5,7 @@ RUN chmod +x /usr/local/bin/dumb-init
 
 RUN conda install --yes \
     -c conda-forge \
-    python==3.7.9 \
+    python==3.7.10 \
     python-blosc==1.10.2 \
     dask==2021.8.1 \
     lz4==3.1.3 \
