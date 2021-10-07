@@ -75,6 +75,7 @@ Resources:
             DefaultCodeRepository: !GetAtt NotebookRepository.CodeRepositoryName
             RoleArn: !GetAtt ExecutionRole.Arn
             LifecycleConfigName:  !GetAtt NotebookLifecycleConfig.NotebookInstanceLifecycleConfigName
+            PlatformIdentifier: notebook-al2-v1
     
 Outputs:
     JupyterNotebook:
