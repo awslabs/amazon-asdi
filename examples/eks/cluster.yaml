@@ -1,0 +1,45 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: pangeo
+  version: "1.20"
+  region: us-west-2
+
+availabilityZones: ['us-west-2a','us-west-2b']
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata:
+      name: cluster-autoscaler
+      namespace: kube-system
+      labels: {aws-usage: "cluster-ops"}
+    wellKnownPolicies:
+      autoScaler: true
+    roleName: eksctl-cluster-autoscaler-role
+    roleOnly: true
+
+managedNodeGroups:
+  - name: main
+    minSize: 1
+    maxSize: 10
+    instanceTypes: ["m5.large", "m5.xlarge"]
+    availabilityZones: ["us-west-2a"]
+    privateNetworking: true
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+  - name: dask-workers
+    minSize: 1
+    maxSize: 30
+    instanceTypes: ["m5.large", "m5.xlarge", "m5.2xlarge", "m5.4xlarge"]
+    availabilityZones: ["us-west-2a"]
+    privateNetworking: true
+    spot: true
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+
+secretsEncryption:
+  keyARN: <insert-your-kms-key-arn-here>
