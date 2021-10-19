@@ -112,8 +112,7 @@ a new one by editing the \<your-desired-region> parameter and running
 the following command:
 
 ```console
-aws kms create-key --description "KMS symmetric key for use with EKS
-cluster" --region <your-desired-region>
+aws kms create-key --description "KMS symmetric key for use with EKS cluster" --region <your-desired-region>
 ```
 
 Take note of the `Arn` value that is returned once your key is created
@@ -202,8 +201,7 @@ so you can skip to the *Deploy the Cluster Autoscaler* section or simply
 run the following commands:
 
 ```console
-kubectl apply -f
-https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
 ```
 
 If you don\'t already know your AWS Account ID you can obtain it by
@@ -217,13 +215,11 @@ Replace `<AWS_ACCOUNT_ID>` with the value of your AWS Account ID before
 running the following command:
 
 ```console
-kubectl annotate serviceaccount cluster-autoscaler -n kube-system
-eks.amazonaws.com/role-arn=arn:aws:iam::<AWS_ACCOUNT_ID>:role/eksctl-cluster-autoscaler-role
+kubectl annotate serviceaccount cluster-autoscaler -n kube-system eks.amazonaws.com/role-arn=arn:aws:iam::<AWS_ACCOUNT_ID>:role/eksctl-cluster-autoscaler-role
 ```
 
 ```console
-kubectl patch deployment cluster-autoscaler -n kube-system -p
-'{"spec":{"template":{"metadata":{"annotations":{"cluster-autoscaler.kubernetes.io/safe-to-evict":"false"}}}}}'
+kubectl patch deployment cluster-autoscaler -n kube-system -p '{"spec":{"template":{"metadata":{"annotations":{"cluster-autoscaler.kubernetes.io/safe-to-evict":"false"}}}}}'
 ```
 
 ```console
@@ -269,8 +265,7 @@ of writing was 1.20.0. Run the following command, replacing the Cluster
 Autoscaler version with a newer version if appropriate:
 
 ```console
-kubectl set image deployment cluster-autoscaler -n kube-system
-cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.20.0
+kubectl set image deployment cluster-autoscaler -n kube-system cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.20.0
 ```
 
 ### Register a domain and create a public certificate to enable HTTPS
@@ -329,8 +324,7 @@ eksctl does not, so you need to run the following command to apply a
 taint to the spot managed node group called *dask-workers*.
 
 ```console
-aws eks update-nodegroup-config --cli-input-json
-'{"clusterName":"pangeo","nodegroupName":"dask-workers","taints":{"addOrUpdateTaints":[{"key":"lifecycle","value":"spot","effect":"NO_EXECUTE"}]}}'
+aws eks update-nodegroup-config --cli-input-json '{"clusterName":"pangeo","nodegroupName":"dask-workers","taints":{"addOrUpdateTaints":[{"key":"lifecycle","value":"spot","effect":"NO_EXECUTE"}]}}'
 ```
 
 The toleration for Dask workers is handled for you by a Helm
