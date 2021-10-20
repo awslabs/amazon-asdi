@@ -27,6 +27,7 @@ managedNodeGroups:
     instanceTypes: ["m5.large", "m5.xlarge"]
     availabilityZones: ["us-west-2a"]
     privateNetworking: true
+    volumeEncrypted: true
     iam:
       withAddonPolicies:
         autoScaler: true
@@ -36,6 +37,7 @@ managedNodeGroups:
     instanceTypes: ["m5.large", "m5.xlarge", "m5.2xlarge", "m5.4xlarge"]
     availabilityZones: ["us-west-2a"]
     privateNetworking: true
+    volumeEncrypted: true
     spot: true
     iam:
       withAddonPolicies:
