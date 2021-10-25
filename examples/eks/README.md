@@ -71,6 +71,8 @@ Here are the steps you follow:
 -   Install a [Cluster
     Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html)
     in the Amazon EKS cluster
+-   Install the [Amazon EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html) 
+    to allow all EBS volumes to be encrypted
 -   Register a domain using [Amazon Route
     53](https://aws.amazon.com/route53/) and obtain a public certificate
     using [AWS Certificate
@@ -273,6 +275,37 @@ Autoscaler version with a newer version if appropriate:
 ```console
 kubectl set image deployment cluster-autoscaler -n kube-system cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.20.0
 ```
+### Install the Amazon EBS CSI driver and update the default storage class
+
+The Amazon EBS Container Storage Interface (CSI) driver allows Amazon EKS to manage
+the lifecycle of Amazon EBS volumes for persistent volumes.  In this case,
+the Amazon EBS CSI driver provides a mechanism to set default EBS encryption for all
+volumes created in the cluster.  To install the Amazon EBS CSI driver, run these commands.
+but first replace <account-id> with your AWS account ID value that you found in the 
+previous section, and replace `602401143452.dkr.ecr.us-west-2.amazonaws.com` if you
+are deploying in a region other than `us-west-2` by finding your region's 
+[container image address](https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html):
+
+```console
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo update
+helm upgrade -install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver \
+    --namespace kube-system \
+    --set image.repository=602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/aws-ebs-csi-driver \
+    --set controller.serviceAccount.create=true \
+    --set controller.serviceAccount.name=ebs-csi-controller-sa \
+    --set controller.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"="arn:aws:iam::<account-id>:role/ebs-csi-driver-role"
+```
+
+The Amazon EBS CSI driver is now installed.  The next step is to overwrite the default
+[Kubernetes storage class](https://docs.aws.amazon.com/eks/latest/userguide/storage-classes.html) 
+so that it uses the Amazon EBS CSI Driver and enables encryption
+for all EBS volumes be default:
+
+```command
+kubectl replace -f storageclass.yaml --force
+```
+
 
 ### Register a domain and create a public certificate to enable HTTPS
 
