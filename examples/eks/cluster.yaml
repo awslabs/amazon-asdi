@@ -3,7 +3,7 @@ kind: ClusterConfig
 
 metadata:
   name: pangeo
-  version: "1.20"
+  version: "1.21"
   region: us-west-2
 
 availabilityZones: ['us-west-2a','us-west-2b']
@@ -19,6 +19,16 @@ iam:
       autoScaler: true
     roleName: eksctl-cluster-autoscaler-role
     roleOnly: true
+  - metadata:
+      name: ebs-csi-controller-sa
+      namespace: kube-system
+      labels:
+        aws-usage: "cluster-ops"
+        app.kubernetes.io/name: aws-ebs-csi-driver
+    wellKnownPolicies:
+      ebsCSIController: true
+    roleName: ebs-csi-driver-role
+    roleOnly: true
 
 managedNodeGroups:
   - name: main
@@ -31,6 +41,7 @@ managedNodeGroups:
     iam:
       withAddonPolicies:
         autoScaler: true
+        ebs: true
   - name: dask-workers
     minSize: 1
     maxSize: 30
@@ -46,6 +57,7 @@ managedNodeGroups:
     iam:
       withAddonPolicies:
         autoScaler: true
+        ebs: true
 
 secretsEncryption:
   keyARN: <insert-your-kms-key-arn-here>
