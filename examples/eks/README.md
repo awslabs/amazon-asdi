@@ -173,8 +173,14 @@ and security resources. Once those foundational resources are created,
 eksctl creates additional stacks, one for each [EKS managed node
 group](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html).
 For this walkthrough, you create two EKS managed node groups, one named
-`dask-workers` that makes use of Amazon Elastic Compute Cloud (Amazon EC2) Spot Instances to save on cost, and one named `main` for everything else that uses EC2 On-Demand
-Instances.
+`dask-workers` that makes use of Amazon Elastic Compute Cloud (Amazon EC2) Spot Instances
+to save on cost, and one named `main` for everything else that uses EC2 On-Demand
+Instances.  The `dask-workers` managed node group has a [Kubernetes
+*taint*](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+that prevent pods from being scheduled onto it, but a corresponding 
+Kubernetes *toleration* on the dask worker pods allows them to be scheduled
+on the tained node group.  All other pods are schedueld onto the `main`
+managed node group.
 
 After 15-25 minutes, your eksctl command should return successfully and
 you have a working EKS cluster.
@@ -298,41 +304,6 @@ Manager](https://aws.amazon.com/certificate-manager/).
     your newly created certificate as you need it in a future step.
 
 The remainder of the setup for HTTPS comes later in the walkthrough.
-
-### Add a taint to the spot managed node group
-
-[Amazon EC2 Spot Instances](https://aws.amazon.com/ec2/spot) let you
-take advantage of unused EC2 capacity to save up to 90% compared to
-On-Demand prices. However, when EC2 needs to reclaim capacity, your spot
-instances can be terminated after a two minute warning period. For a
-Pangeo stack composed of Dask and JupyterHub, it makes sense to run only
-the Dask workers on spot instances, both because they are the primary
-component that will scale up to run large-scale calculations, and
-because Dask can typically recover gracefully from the loss of worker
-nodes in the case that spot instances are terminated.
-
-To make sure that only Dask workers are scheduled onto the spot managed
-node group, configure a [Kubernetes
-*taint*](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-on the spot managed node group along with a Kubernetes *toleration* on
-the Dask worker pods. The Dask workers are then able to \"tolerate\" the
-\"taint\" on the spot managed node group, while all other pods avoid the
-tainted node group.
-
-At the time of writing, EKS managed node groups support taints, but
-eksctl does not, so you need to run the following command to apply a
-taint to the spot managed node group called *dask-workers*.
-
-```console
-aws eks update-nodegroup-config --cli-input-json '{"clusterName":"pangeo","nodegroupName":"dask-workers","taints":{"addOrUpdateTaints":[{"key":"lifecycle","value":"spot","effect":"NO_EXECUTE"}]}}'
-```
-
-The toleration for Dask workers is handled for you by a Helm
-configuration file in the next section. To not only allow Dask workers
-into the spot managed node group but to enforce that they *only* run on
-the spot managed node group, a [Kubernetes
-nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)
-is also configured in that same configuration file in the next section.
 
 ### Install DaskHub using Helm
 

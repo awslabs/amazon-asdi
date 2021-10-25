@@ -39,6 +39,10 @@ managedNodeGroups:
     privateNetworking: true
     volumeEncrypted: true
     spot: true
+    taints:
+    - key: lifecycle
+      value: spot
+      effect: NoExecute
     iam:
       withAddonPolicies:
         autoScaler: true
