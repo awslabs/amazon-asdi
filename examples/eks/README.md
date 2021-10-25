@@ -267,13 +267,13 @@ vi session: `Escape : w q Enter`.
 Navigate to [this page](https://github.com/kubernetes/autoscaler/releases) and keep going
 through the history to find the latest version of the Cluster Autoscaler
 that matches the version of Kubernetes that you are running. For this
-walkthrough, the eksctl configuration file is set to use version 1.20,
+walkthrough, the eksctl configuration file is set to use version 1.21,
 and the latest compatible version of the Cluster Autoscaler at the time
-of writing was 1.20.0. Run the following command, replacing the Cluster
+of writing was 1.21.1. Run the following command, replacing the Cluster
 Autoscaler version with a newer version if appropriate:
 
 ```console
-kubectl set image deployment cluster-autoscaler -n kube-system cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.20.0
+kubectl set image deployment cluster-autoscaler -n kube-system cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.21.1
 ```
 ### Install the Amazon EBS CSI driver and update the default storage class
 
