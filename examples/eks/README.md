@@ -177,7 +177,13 @@ CloudFormation](https://aws.amazon.com/cloudformation/) stacks. The
 `eksctl-pangeo-cluster` stack contains the EKS cluster itself along with
 all of the foundational pieces your EKS cluster needs, including an
 [Amazon VPC](https://aws.amazon.com/vpc/), subnets, and other networking
-and security resources. Once those foundational resources are created,
+and security resources. If you are planning to use your new cluster in a 
+production environment, we recommend reviewing the 
+[security groups](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html) 
+and [network access control lists](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html) 
+that are created and modifying them to be more restrictive.
+
+Once those foundational resources are created,
 eksctl creates additional stacks, one for each [EKS managed node
 group](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html).
 For this walkthrough, you create two EKS managed node groups, one named
