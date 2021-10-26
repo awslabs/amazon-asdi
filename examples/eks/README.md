@@ -117,8 +117,14 @@ the following command:
 aws kms create-key --description "KMS symmetric key for use with EKS cluster" --region <your-desired-region>
 ```
 
-Take note of the `Arn` value that is returned once your key is created
-as you need it for the next section.
+Take note of the `Arn` and `KeyId` values that are returned once your key is created
+as you need them for the next steps.  Once the KMS key is created, enable 
+[automatic key rotation](https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html) 
+as a security best practice using the `KeyId` value returned from the previou command:
+
+```console
+aws kms enable-key-rotation --key-id <KeyId>
+```
 
 ### Create an Amazon EKS Cluster using eksctl
 
