@@ -71,6 +71,8 @@ Here are the steps you follow:
 -   Install a [Cluster
     Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html)
     in the Amazon EKS cluster
+-   Install the [Amazon EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html) 
+    to allow all EBS volumes to be encrypted
 -   Register a domain using [Amazon Route
     53](https://aws.amazon.com/route53/) and obtain a public certificate
     using [AWS Certificate
@@ -115,8 +117,14 @@ the following command:
 aws kms create-key --description "KMS symmetric key for use with EKS cluster" --region <your-desired-region>
 ```
 
-Take note of the `Arn` value that is returned once your key is created
-as you need it for the next section.
+Take note of the `Arn` and `KeyId` values that are returned once your key is created
+as you need them for the next steps.  Once the KMS key is created, enable 
+[automatic key rotation](https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html) 
+as a security best practice using the `KeyId` value returned from the previou command:
+
+```console
+aws kms enable-key-rotation --key-id <KeyId>
+```
 
 ### Create an Amazon EKS Cluster using eksctl
 
@@ -169,12 +177,24 @@ CloudFormation](https://aws.amazon.com/cloudformation/) stacks. The
 `eksctl-pangeo-cluster` stack contains the EKS cluster itself along with
 all of the foundational pieces your EKS cluster needs, including an
 [Amazon VPC](https://aws.amazon.com/vpc/), subnets, and other networking
-and security resources. Once those foundational resources are created,
+and security resources. If you are planning to use your new cluster in a 
+production environment, we recommend reviewing the 
+[security groups](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html) 
+and [network access control lists](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html) 
+that are created and modifying them to be more restrictive.
+
+Once those foundational resources are created,
 eksctl creates additional stacks, one for each [EKS managed node
 group](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html).
 For this walkthrough, you create two EKS managed node groups, one named
-`dask-workers` that makes use of Amazon Elastic Compute Cloud (Amazon EC2) Spot Instances to save on cost, and one named `main` for everything else that uses EC2 On-Demand
-Instances.
+`dask-workers` that makes use of Amazon Elastic Compute Cloud (Amazon EC2) Spot Instances
+to save on cost, and one named `main` for everything else that uses EC2 On-Demand
+Instances.  The `dask-workers` managed node group has a [Kubernetes
+*taint*](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+that prevent pods from being scheduled onto it, but a corresponding 
+Kubernetes *toleration* on the dask worker pods allows them to be scheduled
+on the tained node group.  All other pods are schedueld onto the `main`
+managed node group.
 
 After 15-25 minutes, your eksctl command should return successfully and
 you have a working EKS cluster.
@@ -259,14 +279,45 @@ vi session: `Escape : w q Enter`.
 Navigate to [this page](https://github.com/kubernetes/autoscaler/releases) and keep going
 through the history to find the latest version of the Cluster Autoscaler
 that matches the version of Kubernetes that you are running. For this
-walkthrough, the eksctl configuration file is set to use version 1.20,
+walkthrough, the eksctl configuration file is set to use version 1.21,
 and the latest compatible version of the Cluster Autoscaler at the time
-of writing was 1.20.0. Run the following command, replacing the Cluster
+of writing was 1.21.1. Run the following command, replacing the Cluster
 Autoscaler version with a newer version if appropriate:
 
 ```console
-kubectl set image deployment cluster-autoscaler -n kube-system cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.20.0
+kubectl set image deployment cluster-autoscaler -n kube-system cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.21.1
 ```
+### Install the Amazon EBS CSI driver and update the default storage class
+
+The Amazon EBS Container Storage Interface (CSI) driver allows Amazon EKS to manage
+the lifecycle of Amazon EBS volumes for persistent volumes.  In this case,
+the Amazon EBS CSI driver provides a mechanism to set default EBS encryption for all
+volumes created in the cluster.  To install the Amazon EBS CSI driver, run these commands.
+but first replace <account-id> with your AWS account ID value that you found in the 
+previous section, and replace `602401143452.dkr.ecr.us-west-2.amazonaws.com` if you
+are deploying in a region other than `us-west-2` by finding your region's 
+[container image address](https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html):
+
+```console
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo update
+helm upgrade -install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver \
+    --namespace kube-system \
+    --set image.repository=602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/aws-ebs-csi-driver \
+    --set controller.serviceAccount.create=true \
+    --set controller.serviceAccount.name=ebs-csi-controller-sa \
+    --set controller.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"="arn:aws:iam::<account-id>:role/ebs-csi-driver-role"
+```
+
+The Amazon EBS CSI driver is now installed.  The next step is to overwrite the default
+[Kubernetes storage class](https://docs.aws.amazon.com/eks/latest/userguide/storage-classes.html) 
+so that it uses the Amazon EBS CSI Driver and enables encryption
+for all EBS volumes be default:
+
+```command
+kubectl replace -f storageclass.yaml --force
+```
+
 
 ### Register a domain and create a public certificate to enable HTTPS
 
@@ -298,41 +349,6 @@ Manager](https://aws.amazon.com/certificate-manager/).
     your newly created certificate as you need it in a future step.
 
 The remainder of the setup for HTTPS comes later in the walkthrough.
-
-### Add a taint to the spot managed node group
-
-[Amazon EC2 Spot Instances](https://aws.amazon.com/ec2/spot) let you
-take advantage of unused EC2 capacity to save up to 90% compared to
-On-Demand prices. However, when EC2 needs to reclaim capacity, your spot
-instances can be terminated after a two minute warning period. For a
-Pangeo stack composed of Dask and JupyterHub, it makes sense to run only
-the Dask workers on spot instances, both because they are the primary
-component that will scale up to run large-scale calculations, and
-because Dask can typically recover gracefully from the loss of worker
-nodes in the case that spot instances are terminated.
-
-To make sure that only Dask workers are scheduled onto the spot managed
-node group, configure a [Kubernetes
-*taint*](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-on the spot managed node group along with a Kubernetes *toleration* on
-the Dask worker pods. The Dask workers are then able to \"tolerate\" the
-\"taint\" on the spot managed node group, while all other pods avoid the
-tainted node group.
-
-At the time of writing, EKS managed node groups support taints, but
-eksctl does not, so you need to run the following command to apply a
-taint to the spot managed node group called *dask-workers*.
-
-```console
-aws eks update-nodegroup-config --cli-input-json '{"clusterName":"pangeo","nodegroupName":"dask-workers","taints":{"addOrUpdateTaints":[{"key":"lifecycle","value":"spot","effect":"NO_EXECUTE"}]}}'
-```
-
-The toleration for Dask workers is handled for you by a Helm
-configuration file in the next section. To not only allow Dask workers
-into the spot managed node group but to enforce that they *only* run on
-the spot managed node group, a [Kubernetes
-nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)
-is also configured in that same configuration file in the next section.
 
 ### Install DaskHub using Helm
 
