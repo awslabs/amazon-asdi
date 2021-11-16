@@ -17,7 +17,7 @@ Judges will assess solutions’ impact, innovation, architecture, data usage, an
  
 **Judges will include:**
 - **Adrian Cockcroft**, VP Amazon Sustainability Architecture
-- **Ana Pinera Privette**, Lead Amazon Sustainability Data Exchange
+- **Ana Pinheiro Privette**, Lead Amazon Sustainability Data Initiative 
 - **Lisa McNally**, Head of Cleantech and Sustainability, Thoughtworks
 
 ### Delivery Method: 
