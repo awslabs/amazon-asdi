@@ -35,4 +35,11 @@ Yes. See the Virtual Workshop page.
 **Can I just attend the Mixer?**
 Yes
 
+### Table of Contents: 
+- [Hackathon](/hackathon.md) 
+- [ASDI Instructions](/ASDI-Instructions.md)
+- [ADX Instructions](ADX-Instructions.md) 
+- [Workshop](workshop.md)
+- [Virtual workshop](virtualws.md)
+
                                                                                                           
