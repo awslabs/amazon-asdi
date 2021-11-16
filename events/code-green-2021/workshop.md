@@ -11,3 +11,5 @@ The workshop will take place at the Wynn, Las Vegas from 8 AM to 8 PM. Food and 
 8:30 AM - 5:30 PM - workshop available
 5:30 - 6:30 PM - spectate during hack solution sharing
 6:30 - 8 PM - mixer
+
+### Next: [Virtual Workshop](virtualws.md) 
