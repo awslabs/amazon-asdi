@@ -36,8 +36,8 @@ Yes. See the Virtual Workshop page.
 Yes
 
 ### Table of Contents: 
-- [Hackathon](/hackathon.md)
-- [ASDI Instructions](/ASDI-Instructions.md)
+- [Hackathon](hackathon.md)
+- [ASDI Instructions](ASDI-Instructions.md)
 - [ADX Instructions](ADX-Instructions.md) 
 - [Workshop](workshop.md)
 - [Virtual workshop](virtualws.md)
