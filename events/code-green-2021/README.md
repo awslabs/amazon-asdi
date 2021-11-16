@@ -42,4 +42,6 @@ Yes
 - [Workshop](workshop.md)
 - [Virtual workshop](virtualws.md)
 
+**Next: [Hackathon](hackathon.md)**
+
                                                                                                           
