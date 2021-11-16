@@ -19,7 +19,7 @@ Subscribe to the offers to get access to the underlying data
 - Feel free to subscribe any of the pre-selected data sets below. All are available at no cost
 - Once a subscriber, you can export the data to S3 or premise and began analysis
 
-Additionally, AWS Data Exchange offers access to over 200 no cost data sets that can be found in the [attached spreadsheet](https://amazon.awsapps.com/workdocs/index.html#/document/e8444d018e61d852832f4ec65354c4851d0832f0f43997b4641be168024cd421). Feel free to subscribe to, and use any of them for this hack-a-thon. 
+Additionally, AWS Data Exchange offers access to over 200 no cost data sets that can be found [here](Free, Non-Trial Products on ADX_Aug_2021 (1).xlsx). Feel free to subscribe to, and use any of them for this hack-a-thon. 
 
 ### Additional subscription getting started resources
 
