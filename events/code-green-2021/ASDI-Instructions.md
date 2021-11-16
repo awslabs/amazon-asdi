@@ -45,4 +45,4 @@ Ideas to get started
 
 ### Other Data: [Location](https://registry.opendata.aws/collab/asdi/)
 
-### Next: [ADX Guide](/ADX-Instructions.md)
+### Next: [ADX Guide](ADX-Instructions.md) 
