@@ -31,3 +31,4 @@ The event will take place at the Wynn, Las Vegas from 8:00 AM to 8:00 PM. Food a
 - 9 AM - 5:30 PM - hack
 - 5:30 - 6:30 PM - solution sharing
 - 6:30 - 8 PM - mixer
+
