@@ -25,6 +25,7 @@
 ### Suggested data products:
 
 #### Carbon:
+- [Cloud Carbon Coefficients](https://aws.amazon.com/marketplace/pp/prodview-vulyxbsn34nki?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) - Thoughtworks
 - [C02 emissions (kt) | World Bank Open Data](https://aws.amazon.com/marketplace/pp/prodview-qf3r4b6jpivte?sr=0-3&ref_=beagle&applicationId=AWSMPContessa) - Rearc
 - [Eurostat - Greenhouse Gas Emissions](https://aws.amazon.com/marketplace/search/results?searchTerms=Eurostat+greenhouse&CREATOR=a0524cf6-a4f7-4ace-907d-b1bfb932e830&filters=CREATOR)- Crux
 - [OECD - Air Emissions by Source](https://aws.amazon.com/marketplace/pp/prodview-dfw7buzlknvzw?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) - Crux
