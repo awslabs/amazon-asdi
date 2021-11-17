@@ -35,37 +35,40 @@
 - [Eurostat - Final energy consumption in Household Per Capita](https://aws.amazon.com/marketplace/pp/prodview-iuf3bnfix6bcm?sr=0-12&ref_=beagle&applicationId=AWSMPContessa) - Crux
 - [Climate Data](https://aws.amazon.com/marketplace/pp/prodview-3ckj5jix47trk?sr=0-5&ref_=beagle&applicationId=AWSMPContessa) Crux
 
+#### Environmental, Social, Governance:
 
-#### Waste: 
+- [Arabesque S-Ray Environment Feature Scores (re:Invent Hackathon)](https://aws.amazon.com/marketplace/pp/prodview-prvqsymeaubya?sr=0-1&ref_=beagle&applicationId=AWSMPContessa)- Arabesque
+    **Please complete the ‘Subscription Verification’ request ahead of the hackathon is you have time**
+    
+#### Waste:
 
 - [Eurostat - Waste](https://aws.amazon.com/marketplace/search/results?searchTerms=Eurostat+waste) - Crux
-- [OECD - Food Waste](https://aws.amazon.com/marketplace/pp/prodview-dalajjbxbumv2?sr=0-2&ref_=beagle&applicationId=AWSMPContessa)- Crux
+- [OECD - Food Waste](https://aws.amazon.com/marketplace/pp/prodview-dalajjbxbumv2?sr=0-2&ref_=beagle&applicationId=AWSMPContessa) - Crux
 - [Composting - Solid Waste Management Facilities | Open Data NY](https://aws.amazon.com/marketplace/pp/prodview-vwwfoqleekt5q?sr=0-4&ref_=beagle&applicationId=AWSMPContessa) - Rearc
 - [Recyclables Handling & Recovery Facilities (RHRF) | Open Data NY](https://aws.amazon.com/marketplace/pp/prodview-ms3pdaluxvgia?sr=0-7&ref_=beagle&applicationId=AWSMPContessa) - Rearc
 
-#### Energy: 
+#### Energy:
 
-- [25 OECD & Eurostat energy data products](https://aws.amazon.com/marketplace/search/results?searchTerms=energy&FULFILLMENT_OPTION_TYPE=DATA_EXCHANGE&PRICING_MODEL=FREE&CREATOR=a0524cf6-a4f7-4ace-907d-b1bfb932e830&filters=FULFILLMENT_OPTION_TYPE%2CPRICING_MODEL%2CCREATOR) - Crux
+- [25, OECD & Eurostat energy data products](https://aws.amazon.com/marketplace/search/results?searchTerms=energy&FULFILLMENT_OPTION_TYPE=DATA_EXCHANGE&PRICING_MODEL=FREE&CREATOR=a0524cf6-a4f7-4ace-907d-b1bfb932e830&filters=FULFILLMENT_OPTION_TYPE%2CPRICING_MODEL%2CCREATOR) - Crux
 
-### Water:
+#### Water:
 
 - [Eurostat - Water](https://aws.amazon.com/marketplace/search/results?searchTerms=Eurostat+water) - Crux
-- [OECD - Freshwater Abstractions](http://oecd%20-%20freshwater%20abstractions/) - Crux
+- [OECD - Freshwater Abstractions](http://OECD - Freshwater Abstractions) - Crux
 
-
-
-### Other
+#### Other:
 
 - [35, Eurostat data products ranging from climate risk losses to living conditions](https://aws.amazon.com/marketplace/search/results?searchTerms=Eurostat)- Crux
 - [US monthly Air Quality](https://aws.amazon.com/marketplace/pp/prodview-b3rjkczmlpikq?sr=0-9&ref_=beagle&applicationId=AWSMPContessa) - BreezoMeter
 - [32, population-related data products](https://aws.amazon.com/marketplace/search/results?searchTerms=population&FULFILLMENT_OPTION_TYPE=DATA_EXCHANGE&CREATOR=a8a86da2-b2d1-4fae-992d-03494e90590b&filters=FULFILLMENT_OPTION_TYPE%2CCREATOR)- Rearc
 - [Social Vulnerability Index | CDC/ATSDR](https://aws.amazon.com/marketplace/pp/prodview-q7o2j7btbmtzg?qid=1626095638367&sr=0-8&ref_=srh_res_product_title) - Rearc 
-- [Social Characteristics Estimate | ACS](https://aws.amazon.com/marketplace/pp/prodview-zndny7zqdq7xu?qid=1626095638367&sr=0-1&ref_=srh_res_product_title#offers)- Rearc
+- [Social Characteristics Estimate | ACS](https://aws.amazon.com/marketplace/pp/prodview-zndny7zqdq7xu?qid=1626095638367&sr=0-1&ref_=srh_res_product_title#offers) - Rearc
 - [OECD - Family Indicators](https://aws.amazon.com/marketplace/pp/prodview-ti75agiyihjls?qid=1626095795997&sr=0-10&ref_=srh_res_product_title) - Crux
 - [Eurostat - Living Conditions and Welfare](https://aws.amazon.com/marketplace/pp/prodview-oxwt45ktx5vae?qid=1626096118946&sr=0-42&ref_=srh_res_product_title#offers) - Crux
 - [UN World Population Estimates](https://aws.amazon.com/marketplace/pp/prodview-lc63p76rkg57s?qid=1626096478019&sr=0-119&ref_=srh_res_product_title)- Rearc
 - [OECD - Real Minimum Wages](https://aws.amazon.com/marketplace/pp/prodview-nd76okbnw3yiq?qid=1626097178543&sr=0-3&ref_=srh_res_product_title) - Crux
 - [OECD - Education Statistics](https://aws.amazon.com/marketplace/pp/prodview-qy3vqjsoqzxye?qid=1626096276665&sr=0-61&ref_=srh_res_product_title)- Crux
+
 
 
 
