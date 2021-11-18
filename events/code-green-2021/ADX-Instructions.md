@@ -54,7 +54,7 @@
 #### Water:
 
 - [Eurostat - Water](https://aws.amazon.com/marketplace/search/results?searchTerms=Eurostat+water) - Crux
-
+- [OECD - Freshwater Abstractions](https://aws.amazon.com/marketplace/pp/prodview-tam6tccod2mbq?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) - Crux
 
 #### Other:
 
