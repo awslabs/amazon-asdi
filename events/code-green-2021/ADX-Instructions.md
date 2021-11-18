@@ -31,13 +31,14 @@
 - [OECD - Air Emissions by Source](https://aws.amazon.com/marketplace/pp/prodview-dfw7buzlknvzw?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) - Crux
 - [Low Emission Zone Boundaries | OpenStreetMaps](https://aws.amazon.com/marketplace/pp/prodview-sujil5edyjvja?sr=0-2&ref_=beagle&applicationId=AWSMPContessa) - Rearc
 - [USEEIO | Supply Chain Factors](https://aws.amazon.com/marketplace/pp/prodview-2wmkccq5gq3j2?sr=0-15&ref_=beagle&applicationId=AWSMPContessa) - Rearc
-- [Eurostat - Electricity Production Capacities for Renewables and Waste](https://aws.amazon.com/marketplace/pp/prodview-f7djq4dwbgyvg?sr=0-5&ref_=beagle&applicationId=AWSMPContessa)e - Crux
+- [Eurostat - Electricity Production Capacities for Renewables and Waste](https://aws.amazon.com/marketplace/pp/prodview-f7djq4dwbgyvg?sr=0-5&ref_=beagle&applicationId=AWSMPContessa) - Crux
 - [Eurostat - Final energy consumption in Household Per Capita](https://aws.amazon.com/marketplace/pp/prodview-iuf3bnfix6bcm?sr=0-12&ref_=beagle&applicationId=AWSMPContessa) - Crux
-- [Climate Data](https://aws.amazon.com/marketplace/pp/prodview-3ckj5jix47trk?sr=0-5&ref_=beagle&applicationId=AWSMPContessa) Crux
+- [Climate Data] - (https://aws.amazon.com/marketplace/pp/prodview-3ckj5jix47trk?sr=0-5&ref_=beagle&applicationId=AWSMPContessa) - Crux
 
 #### Environmental, Social, Governance:
 
-- [Arabesque S-Ray Environment Feature Scores (re:Invent Hackathon)](https://aws.amazon.com/marketplace/pp/prodview-prvqsymeaubya?sr=0-1&ref_=beagle&applicationId=AWSMPContessa)- Arabesque
+- [Arabesque S-Ray Environment Feature Scores (re:Invent Hackathon)](https://aws.amazon.com/marketplace/pp/prodview-prvqsymeaubya?sr=0-1&ref_=beagle&applicationId=AWSMPContessa)- Arabesque: 
+
     **Please complete the ‘Subscription Verification’ request ahead of the hackathon is you have time**
     
 #### Waste:
