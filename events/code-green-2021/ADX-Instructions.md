@@ -39,7 +39,7 @@
 
 - [Arabesque S-Ray Environment Feature Scores (re:Invent Hackathon)](https://aws.amazon.com/marketplace/pp/prodview-prvqsymeaubya?sr=0-1&ref_=beagle&applicationId=AWSMPContessa)- Arabesque: 
 
-    **Please complete the ‘Subscription Verification’ request ahead of the hackathon is you have time**
+**Before the hack, make sure to complete the [subscription verification request](https://aws.amazon.com/marketplace/pp/prodview-prvqsymeaubya?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) for the Arabesque S-Ray Environmental Feature Scores data product to ensure you have access to the data during the day of the event.**
     
 #### Waste:
 
