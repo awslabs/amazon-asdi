@@ -32,4 +32,7 @@ The event will take place at the Wynn, Las Vegas from 8:00 AM to 8:00 PM. Food a
 - 5:30 - 6:30 PM - solution sharing
 - 6:30 - 8 PM - mixer
 
+### Dataset Note: 
+**Before the hack**, make sure to complete the [subscription verification request](https://aws.amazon.com/marketplace/pp/prodview-prvqsymeaubya?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) for the Arabesque S-Ray Environmental Feature Scores data product to ensure you have access to the data during the day of the event. Please see the [ADX Guide](https://github.com/awslabs/amazon-asdi/blob/main/ADX-Instructions.md) for more details on available data products.
+
 **Next: [ASDI Instructions](ASDI-Instructions.md)**
