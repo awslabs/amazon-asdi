@@ -9,4 +9,28 @@ Code Green! brings builders together to solve sustainability-related technical c
 - 12PM - 2PM PST Wednesday Dec 8th, 2021
 
 ### Workshop meeting links:
-- We will update here with a meeting link to join the virtual workshop prior to the event.
+
+### Europe & Middle East time zones
+ 
+You are invited to a Zoom meeting for the Code Green! 2021 Virtual Workshop 
+When: Dec 6, 2021 08:00 AM Mountain Time (US and Canada) 
+Register in advance for this meeting:
+https://thoughtworks.zoom.us/meeting/register/tJclc-ispz0rHN0MouJk61WrCZAmU2_124uh 
+After registering, you will receive a confirmation email containing information about joining the meeting.
+
+### Asia Pacific time zones
+
+You are invited to a Zoom meeting for the Code Green! 2021 Virtual Workshop
+When: Dec 7, 2021 08:00 PM Mountain Time (US and Canada) 
+Register in advance for this meeting:
+https://thoughtworks.zoom.us/meeting/register/tJwtcumqqTwvHNOtGQpONfMoIXDxUTyowtLw 
+After registering, you will receive a confirmation email containing information about joining the meeting.
+
+
+### Americas time zones
+
+You are invited to a Zoom meeting for the Code Green! 2021 Virtual Workshop
+When: Dec 8, 2021 01:00 PM Mountain Time (US and Canada) 
+Register in advance for this meeting:
+https://thoughtworks.zoom.us/meeting/register/tJYlcO6vpjopGdFsIwQ2cHUL6j9M6iZoqBe8 
+After registering, you will receive a confirmation email containing information about joining the meeting.
