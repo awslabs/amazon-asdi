@@ -7,7 +7,7 @@ Are you a builder that loves our Earth? If so, come code ‘green’ with us and
 - Drop-in anytime to walk through a guided workshop and get hands-on with climate data (8 AM – 6:30 PM)
 - Socialize with industry leaders like Adrian Cockcroft and others. (6:30 PM – 8 PM)
 
-You can choose to participate in all three of our events or choose one or two. Register for HJS304 in the re:Invent attendee portal to attend any of the above.
+You can choose to participate in all three of our events or choose one or two. Register for HJS304 in the re:Invent attendee portal or walk-in on Monday at the Wynn, Lafite 5, to attend any of the above.
 
 ## Hackathon
 The Code Green Hackathon is an all-day coding event for builders to solve a sustainability-related technical challenge. Entries will leverage sustainability data available in the *Amazon Sustainability Data Initiative (ASDI)* or *AWS Data Exchange (ADX)*. Prizes include reMarkable 2 paper tablets, $50k AWS credits, plus all registrants have the carbon emmisions of their air travel to re:Invent offset.
@@ -25,6 +25,9 @@ As a leading global technology consultancy, Thoughtworks has been at the forefro
 ### FAQs
 **Do I need to be there 8 AM- 8 PM?**
 No. Come and go while hacking or drop-in for the workshop. You may join late.
+
+**Do I need to register?**
+No. You may walk-in. Loctaion for all events is the Wynn, Lafite 5.
 
 **What do I get?**
 All registrants get a $50 AWS credit and will have carbon emissions of their flights to re:Invent offset. See prizes on the Hackathon page.
