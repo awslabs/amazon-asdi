@@ -27,7 +27,7 @@ As a leading global technology consultancy, Thoughtworks has been at the forefro
 No. Come and go while hacking or drop-in for the workshop. You may join late.
 
 **Do I need to register?**
-No. You may walk-in. Loctaion for all events is the Wynn, Lafite 5.
+No. You may walk-in. The location for all events is the Wynn, Lafite 5.
 
 **What do I get?**
 All registrants get a $50 AWS credit and will have carbon emissions of their flights to re:Invent offset. See prizes on the Hackathon page.
