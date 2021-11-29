@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Web client for the AWS Code Green sustainability hack, first presented at re:Invent 2019">
+    <meta name="author" content="AWS">
+
+    <title>DeepRacer toolkit</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  
+    <style>
+      main > .container {
+        padding: 60px 15px 0;
+      }
+      .footer {
+        background-color: #f5f5f5;
+      }
+      .footer > .container {
+        padding-right: 15px;
+        padding-left: 15px;
+      }
+      .logo {
+        width: 50px;
+        margin-right: 15px;
+      }
+      .result {
+        color: white;
+        background-color: red;
+        padding: 10px;
+      }
+      @media (max-width: 576px) {
+        #submitter {
+          margin-left: 10px;
+          margin-top: -15px;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="d-flex flex-column h-100">
+    
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+        <div class="container">
+          <a class="navbar-brand" href="#">
+            <img src="https://www.pngkey.com/png/full/59-591738_don-southard-strategy-innovation-aws-logo-transparent-background.png" class="logo" />
+            DeepRacer Toolkit</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="#">Find city
+                  <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="https://aws.amazon.com/deepracer/league/">League</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Workshop</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main role="main" class="flex-shrink-0">
+      <div class="container pt-3">
+        <div class="row">
+          <div class="col-lg-12 text-center">
+        
+            <img style="width: 30%" src="https://d1.awsstatic.com/gamedev/ho/Final_assets/heroes/overlay-art/DeepRacer_Chrome_Hero.fef860ca51bde88d4fdf591ed8fe8668c1fd8343.png" alt="AWS DeepRacer logo"/>
+        
+            <h1 class="mt-3">DeepRacer Track Finder</h1>
+            <p class="lead">Find the best city for your DeepRacer Pop-up race!</p>
+          
+            <p class="mt-4">
+              Enter a temperature in Celsius.<br>
+              Track Finder will look for the DeepRacer League City most likely to be near it.
+            </p>
+          
+            <form class="find_city">
+              <div class="form-inline justify-content-center">
+                <div class="form-group  mx-sm-3 mt-4">
+                  <input type="number" name="cel" id="degrees" class="form-control mb-4" required="required" placeholder="degrees Celsius" autofocus="autofocus">
+                </div>
+                <button type="submit" class="btn btn-primary mb-0" id="submitter">Go</button>
+              </div>
+              
+              <div class="form-group mx-sm-3 mt-3">
+                <a href="#" onclick="$('.api').toggle();" class="api">use your own endpoint!</a>
+                
+                <div class="api" style="display:none;">
+                  <input type="url" id="api-endpoint" class="form-control mb-4 justify-content-center" style="max-width:400px; margin-left: auto; margin-right: auto;" placeholder="https://example.com" pattern="https://.*">
+                  <div style="font-size:11px;">
+                    You may encounter CORS issues using your own endpoint. Docs on getting around that <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html" target="_blank">here.</a>
+                  </div>
+                </div>
+              </div>
+            </form>
+        
+            <h2 id="result" class="mt-4 mb-3 find_city" style="display: none; color:red">Determining best city<br>using NOAA ASDI data.... </h2>
+        
+          </div>
+        </div>
+      </div>
+    </main>
+  
+    <footer class="footer mt-auto py-3">
+      <div class="container">
+        <span class="text-muted">© 2019, Amazon Web Services, Inc. or its affiliates. All rights reserved.</span>
+      </div>
+    </footer>
+  
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  
+  
+    <script>
+      URL = 'https://60ph734gnb.execute-api.us-east-1.amazonaws.com/test/query';
+    
+      $("form").on('submit',function(e){
+          e.preventDefault();
+          $(".find_city").toggle();
+        
+          // put degrees celsius into correct format
+          cel = $("#degrees").val() * 10;
+          
+          // use endpoint from query string parameters if provided
+          queryStringEndpoint = new URLSearchParams(window.location.search).get('endpoint');
+          if (queryStringEndpoint) {
+            URL = queryStringEndpoint
+          }
+          
+          // use user provided enndpoint if entered
+          user_api_endpoint = $("#api-endpoint").val();
+          if (typeof user_api_endpoint != 'undefined' && user_api_endpoint.length > 0) {
+            URL = user_api_endpoint;
+          }
+          
+          url = URL + '?cities=best&target=' + cel + '&days=14';
+          console.log(cel + ' ' + url);
+
+          // trigger async function, log response or catch error of fetch promise
+          fetchAsync(url)
+          .then(data => appendData(data))
+          .catch(reason => console.log(reason.message))
+      });
+    
+      // async function to request data
+      async function fetchAsync (url) {
+
+        // await response of fetch call
+        let response = await fetch(url);
+
+        // only proceed once promise is resolved
+        let data = await response.json();
+
+        // only proceed once second promise is resolved
+        return data;
+      }
+
+      // write data
+      function appendData(data) {
+        var mainContainer = document.getElementById("result");
+        mainContainer.innerHTML = "<br>";
+
+        // Loop through the returned object and list the cities in order
+        for (const prop in data) {
+          if (data.hasOwnProperty(prop)) {
+            var div = document.createElement("div");
+            div.setAttribute("class", "result");
+            div.innerHTML = 'Consider ' + `${prop}` + '!';
+            mainContainer.appendChild(div);
+          }
+        }
+      }
+
+    </script>
+  </body>
+</html>
