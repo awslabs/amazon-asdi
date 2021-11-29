@@ -13,7 +13,7 @@ Two honorable mention prizes of $1,500 AWS credits each will be awarded.
 The real winner? Earth of course.
 
 ### Judges and Judging Criteria:
-Judges will assess solutions’ impact, innovation, architecture, data usage, and readiness. Please refer to the score card (https://github.com/awslabs/amazon-asdi/blob/main/scorecard.md) for more details. Final judging may take place after the event. 
+Judges will assess solutions’ impact, innovation, architecture, data usage, and readiness. Please refer to [the score card](/scorecard.md) for more details. Final judging may take place after the event. 
  
 **Judges will include:**
 - **Adrian Cockcroft**, VP Amazon Sustainability Architecture
