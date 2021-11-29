@@ -21,7 +21,7 @@ Judges will assess solutions’ impact, innovation, architecture, data usage, an
 - **Lisa McNally**, Head of Cleantech and Sustainability, Thoughtworks
 
 ### Delivery Method: 
-All hackers will receive $50 AWS credits to freely access necessary AWS resources and services. Teams will consist of 2-6 hackers. Solutions must be posted to Githhub for consideration and must include a Readme. 
+All hackers will receive $50 AWS credits to freely access necessary AWS resources and services. Teams will consist of 1-6 hackers. Solutions must be posted to Githhub for consideration and must include a Readme. 
 Teams can work from 8:00 AM - 5:30 PM, and time will be set aside at the end for demos.
 
 ### Logistics: 
