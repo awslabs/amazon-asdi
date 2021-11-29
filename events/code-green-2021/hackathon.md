@@ -18,7 +18,10 @@ Judges will assess solutions’ impact, innovation, architecture, data usage, an
 **Judges will include:**
 - **Adrian Cockcroft**, VP Amazon Sustainability Architecture
 - **Ana Pinheiro Privette**, Lead Amazon Sustainability Data Initiative 
+- **Kelci Zile**, Global Lead Amazon Data Exchange
+- **Cassandra Shum**, Head of Cloud Strategy and Modernization, Thoughtworks 
 - **Lisa McNally**, Head of Cleantech and Sustainability, Thoughtworks
+
 
 ### Delivery Method: 
 All hackers will receive $50 AWS credits to freely access necessary AWS resources and services. Teams will consist of 1-6 hackers. Solutions must be posted to Githhub for consideration and must include a Readme. 
