@@ -21,6 +21,7 @@ Datasets from ASDI are listed on the [Registry of Open Data on AWS's ASDI collab
 Event  | Description
 :----- | :------------
 [Code Green 2019](events/code-green-2019) | Code Green is both a hackathon and workshop, originally created for re:Invent 2019, centered around exploring Amazon Sustainability Data Initiative (ASDI) datasets.
+[Code Green 2021](events/code-green-2021) | Code Green is both a hackathon and workshop. This version was created for re:Invent 2021, and centers around exploring Amazon Sustainability Data Initiative (ASDI) and AWS Data Exchange (ADX) datasets.
 
 
 ### Examples 
