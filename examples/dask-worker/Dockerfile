@@ -1,10 +1,29 @@
-FROM quay.io/condaforge/miniforge3
+FROM public.ecr.aws/docker/library/python:3.10-slim-buster
+
+ENV PYTHONUNBUFFERED=TRUE
+ENV DEBIAN_FRONTEND noninteractive
+ENV CONDA_DIR="/opt/conda"
+ENV PATH="${CONDA_DIR}/bin:${PATH}"
+
+RUN apt-get update \
+  && apt-get install -y bzip2 gcc wget \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN arch=$(uname -m) && \
+    if [ "${arch}" = "x86_64" ]; then \
+        arch="64"; \
+    fi && \
+    wget -qO- https://anaconda.org/conda-forge/micromamba/0.19.1/download/linux-${arch}/micromamba-0.19.1-0.tar.bz2 | tar -xvj bin/micromamba --strip-components=1
+
+RUN mkdir -p "${CONDA_DIR}" && \
+    mv micromamba /bin/micromamba
+
 
 RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64
 RUN chmod +x /usr/local/bin/dumb-init
 
-RUN conda install --yes \
-    -c conda-forge \
+RUN micromamba install --root-prefix="${CONDA_DIR}" --prefix="${CONDA_DIR}" \
+    -y -c conda-forge \
     python==3.7.10 \
     python-blosc==1.10.2 \
     dask==2021.8.1 \
