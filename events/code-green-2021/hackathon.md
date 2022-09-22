@@ -3,7 +3,7 @@
 ### Problem and Datasets:
 Hackers will use AWS build a solution that addresses the global climate crisis. Impactful topics and use cases include, but are not limited to, reducing carbon emissions, protecting diversity, reducing waste, and replenishing water.
 You will be expected to create a solution utilizing the datasets offered by AWS Data Exchange (ADX) and ASDI that addresses a sustainability focused problem. To help guide your ideas, we have selected a few datasets that might be useful for getting started. Please note you are not limited to these options.
-To take advantage of these datasets, please refer to the [ASDI guide](ASDI-Instructions.md) and [ADX Guide](ADX-Instructions.md) we created.
+To take advantage of these datasets, please refer to the ASDI guide (https://github.com/awslabs/amazon-asdi/blob/main/events/code-green-2021/ASDI-Instructions.md) and ADX Guide (https://github.com/awslabs/amazon-asdi/blob/main/events/code-green-2021/ADX-Instructions.md) we created.
 
 ### Prizes:
 Top prize includes a $25,000 AWS credit, VIP seating to Dr. Werner Vogels keynote, and other goodies for each team member to get your solution off the ground including tablet that looks and feels like paper.
