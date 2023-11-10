@@ -91,19 +91,19 @@ For this walkthrough, you need the following:
     AWS CloudFormation, and VPCs.
 -   [Install the AWS
     CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
-    (for this walkthrough we used version 2.2.21)
+    (for this walkthrough we used version 2.13.33)
 -   [Configure the AWS
     CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
     (the credentials that you configure are stored and used by eksctl)
 -   [Install
     kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)
-    (for this walkthrough we used version 1.21.2)
+    (for this walkthrough we used version 1.28.3)
 -   [Install
     eksctl](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html)
-    (for this walkthrough we used version 0.57.0)
+    (for this walkthrough we used version 0.164.0)
 -   [Install
     Helm](https://docs.aws.amazon.com/eks/latest/userguide/helm.html)
-    (for this walkthrough we used using version 3.6.3)
+    (for this walkthrough we used using version 3.13.2)
 
 ### Create an Amazon KMS key
 
@@ -120,7 +120,7 @@ aws kms create-key --description "KMS symmetric key for use with EKS cluster" --
 Take note of the `Arn` and `KeyId` values that are returned once your key is created
 as you need them for the next steps.  Once the KMS key is created, enable 
 [automatic key rotation](https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html) 
-as a security best practice using the `KeyId` value returned from the previou command:
+as a security best practice using the `KeyId` value returned from the previous command:
 
 ```console
 aws kms enable-key-rotation --key-id <KeyId>
@@ -279,13 +279,13 @@ vi session: `Escape : w q Enter`.
 Navigate to [this page](https://github.com/kubernetes/autoscaler/releases) and keep going
 through the history to find the latest version of the Cluster Autoscaler
 that matches the version of Kubernetes that you are running. For this
-walkthrough, the eksctl configuration file is set to use version 1.21,
+walkthrough, the eksctl configuration file is set to use version 1.28,
 and the latest compatible version of the Cluster Autoscaler at the time
-of writing was 1.21.1. Run the following command, replacing the Cluster
+of writing was 1.28.0. Run the following command, replacing the Cluster
 Autoscaler version with a newer version if appropriate:
 
 ```console
-kubectl set image deployment cluster-autoscaler -n kube-system cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.21.1
+kubectl set image deployment cluster-autoscaler -n kube-system cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.28.0
 ```
 ### Install the Amazon EBS CSI driver and update the default storage class
 
