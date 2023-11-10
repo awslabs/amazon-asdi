@@ -3,7 +3,7 @@ kind: ClusterConfig
 
 metadata:
   name: pangeo
-  version: "1.21"
+  version: "1.28"
   region: us-west-2
 
 availabilityZones: ['us-west-2a','us-west-2b']
