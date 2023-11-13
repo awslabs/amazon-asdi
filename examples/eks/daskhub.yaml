@@ -1,8 +1,11 @@
 jupyterhub:
+  scheduling:
+    userScheduler:
+      enabled: false
   singleuser:
     image:
       name: pangeo/pangeo-notebook
-      tag: "2021.05.04"
+      tag: "2023.10.28"
     cpu:
       limit: 2
       guarantee: 1
@@ -61,7 +64,7 @@ dask-gateway:
         c.Backend.cluster_options = Options(
             Float("worker_cores", default=0.8, min=0.8, max=4.0, label="Worker Cores"),
             Float("worker_memory", default=3.3, min=1, max=8, label="Worker Memory (GiB)"),
-            String("image", default="pangeo/base-notebook:2021.05.04", label="Image"),
+            String("image", default="pangeo/base-notebook:2023.10.28", label="Image"),
             handler=option_handler,
         )
     auth:
